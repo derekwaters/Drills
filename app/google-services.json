@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "179658341376",
+    "firebase_url": "https://drills-fb72f.firebaseio.com",
+    "project_id": "drills-fb72f",
+    "storage_bucket": "drills-fb72f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:179658341376:android:eb98021f514e5526",
+        "android_client_info": {
+          "package_name": "com.frisbeeworld.drills"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "179658341376-6mfptaug9lstop6a5p91buqmcjrhl3dm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.frisbeeworld.drills",
+            "certificate_hash": "c53006449b24cc0470efc81167e0a0fd9325f4c7"
+          }
+        },
+        {
+          "client_id": "179658341376-s6hhj7m68s7km8kfa16birnbmv56fjbb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDXF7j_3Gi2lJwops-iG29x6dRzyMQvdU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "179658341376-s6hhj7m68s7km8kfa16birnbmv56fjbb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

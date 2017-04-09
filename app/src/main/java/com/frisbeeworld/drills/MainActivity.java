@@ -1,0 +1,250 @@
+package com.frisbeeworld.drills;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.firebase.ui.auth.AuthUI;
+import com.frisbeeworld.drills.database.Session;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static com.frisbeeworld.drills.R.id.fab;
+
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
+
+    public static final String ANONYMOUS = "Anonymous";
+    public static final int RC_SIGN_IN = 101;
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    private String mCurrentUser;
+
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference sessionsReference;
+    private ChildEventListener sessionEventListener;
+
+    private FloatingActionButton floatingActionButton;
+
+    private SessionAdapter sessionAdapter;
+    private ListView sessionList;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mCurrentUser = ANONYMOUS;
+
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        sessionsReference = firebaseDatabase.getReference().child("sessions");
+
+        this.mAuth = FirebaseAuth.getInstance();
+        this.mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null)
+                {
+                    onSignedInInitialise(user.getDisplayName());
+                    Toast.makeText(MainActivity.this, "Welcome to Drills!", Toast.LENGTH_SHORT).show();
+                    // We have a logged in user!
+                    floatingActionButton.show();
+                }
+                else
+                {
+                    // No logged in user. :(
+                    onSignedOutCleanup();
+                    startActivityForResult(
+                            AuthUI.getInstance()
+                                .createSignInIntentBuilder()
+                                .setIsSmartLockEnabled(false)
+                                .setProviders(Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
+                                    new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
+                            .build(),
+                        RC_SIGN_IN
+                    );
+
+                    floatingActionButton.hide();
+                }
+            }
+        };
+
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        this.floatingActionButton = (FloatingActionButton)findViewById(fab);
+        this.floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent addSessionIntent = new Intent(getApplicationContext(), AddSessionActivity.class);
+                startActivity(addSessionIntent);
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                //        .setAction("Action", null).show();
+            }
+        });
+
+        List<Session> sessionsList = new ArrayList<>();
+        sessionAdapter = new SessionAdapter(this, R.layout.item_session, sessionsList);
+        sessionList = (ListView)findViewById(R.id.session_list);
+        sessionList.setAdapter(sessionAdapter);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        else if (id == R.id.action_sign_out)
+        {
+            AuthUI.getInstance().signOut(this);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+        detachDatabaseReadListener();
+        sessionAdapter.clear();
+    }
+
+    private void onSignedInInitialise(String username) {
+        mCurrentUser = username;
+        attachDatabaseReadListener();
+    }
+
+    private void attachDatabaseReadListener()
+    {
+        if (sessionEventListener == null)
+        {
+            sessionEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    Session newSession = dataSnapshot.getValue(Session.class);
+                    sessionAdapter.add(newSession);
+                }
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                }
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                }
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            };
+            sessionsReference.addChildEventListener(sessionEventListener);
+        }
+    }
+
+    private void onSignedOutCleanup()
+    {
+        mCurrentUser = ANONYMOUS;
+        sessionAdapter.clear();
+        detachDatabaseReadListener();
+    }
+
+    private void detachDatabaseReadListener()
+    {
+        if (sessionEventListener != null)
+        {
+            sessionsReference.removeEventListener(sessionEventListener);
+            sessionEventListener = null;
+        }
+    }
+
+}
