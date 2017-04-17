@@ -36,6 +36,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.frisbeeworld.drills.MainActivity" />
         </activity>
+        <activity android:name=".PickDrillsActivity"></activity>
     </application>
 
 </manifest>
