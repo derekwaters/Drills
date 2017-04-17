@@ -27,6 +27,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.frisbeeworld.drills.MainActivity" />
         </activity>
+        <activity
+            android:name=".EditSessionActivity"
+            android:label="@string/title_activity_edit_session"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.frisbeeworld.drills.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

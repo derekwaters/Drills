@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -101,8 +102,6 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 Intent addSessionIntent = new Intent(getApplicationContext(), AddSessionActivity.class);
                 startActivity(addSessionIntent);
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                //        .setAction("Action", null).show();
             }
         });
 
@@ -110,6 +109,23 @@ public class MainActivity extends AppCompatActivity
         sessionAdapter = new SessionAdapter(this, R.layout.item_session, sessionsList);
         sessionList = (ListView)findViewById(R.id.session_list);
         sessionList.setAdapter(sessionAdapter);
+
+        sessionList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                return false;
+            }
+        });
+
+        sessionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Session sessionData = sessionAdapter.getItem(position);
+                DrillsDatastore.getDatastore().setCurrentSession(sessionData);
+                Intent editSessionIntent = new Intent(getApplicationContext(), EditSessionActivity.class);
+                startActivity(editSessionIntent);
+            }
+        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -212,6 +228,7 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Session newSession = dataSnapshot.getValue(Session.class);
+                    //newSession.setId(dataSnapshot.getKey());
                     sessionAdapter.add(newSession);
                 }
                 @Override
