@@ -8,6 +8,7 @@ public class Drill {
     private String[] tags;
     private int minTime;
     private int maxTime;
+    private String description;
 
     public int getId() {
         return id;
@@ -61,6 +62,9 @@ public class Drill {
         this.maxTime = maxTime;
     }
 
+    public String getDescription() { return description; }
+
+    public void setDescription(String desc) { this.description = desc; }
     /*
 
     id

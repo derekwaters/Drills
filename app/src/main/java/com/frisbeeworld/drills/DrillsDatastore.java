@@ -60,8 +60,23 @@ public class DrillsDatastore {
         newDrill.setMinTime(1);
         newDrill.setMaxTime(10);
         newDrill.setName("Handball Lines");
+        newDrill.setDescription("A description goes here. Something about how the drill runs");
 
         drills.add(newDrill);
+
+
+        newDrill = new Drill();
+        newDrill.setId(1001);
+        newDrill.setVideoUrl("http://www.youtube.com/");
+        newDrill.setImageUrl("http://www.google.com/");
+        newDrill.setTags(new String[]{"kicking", "junior", "senior"});
+        newDrill.setMinTime(15);
+        newDrill.setMaxTime(20);
+        newDrill.setName("Kick To Kick");
+        newDrill.setDescription("A description goes here. Something about how the drill runs");
+
+        drills.add(newDrill);
+
 
         tags.add("handball");
         tags.add("kick");

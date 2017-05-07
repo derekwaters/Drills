@@ -5,23 +5,69 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="16dp"
+    android:layout_marginEnd="16dp"
     android:layout_marginStart="@dimen/activity_horizontal_margin"
     android:orientation="vertical">
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/card_drill"
-        android:layout_height="200dp"
-        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_gravity="center"
+        android:layout_margin="10dp"
         card_view:cardCornerRadius="4dp"
-        card_view:cardElevation="4dp">
-        <TextView
-            android:id="@+id/text_drill_name"
-            android:layout_width="wrap_content"
+        card_view:cardElevation="2dp">
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            tools:text="DRILL NAME"/>
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/text_drill_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:background="@color/cardview_dark_background"
+                android:textColor="@color/cardview_light_background"
+                android:padding="8dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                tools:text="DRILL NAME"/>
+
+            <ImageView
+                android:id="@+id/image_drill_preview"
+                android:layout_width="200dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                android:background="@color/cardview_light_background"
+                android:padding="8dp" />
+
+            <TextView
+                android:id="@+id/text_drill_timing"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
+                android:padding="2dp"
+                android:drawableLeft="@drawable/ic_timer_black_24dp"
+                android:drawablePadding="8dp"
+                tools:text="NN - MM minutes"/>
+
+            <TextView
+                android:id="@+id/text_drill_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:padding="8dp"
+                android:textAlignment="viewStart"
+                tools:text="A full description of the drill should go in here. Ideally we'd also have some nice info about how many people are needed to run the drill etc." />
+
+            <com.adroitandroid.chipcloud.ChipCloud
+                xmlns:chipcloud = "http://schemas.android.com/apk/res-auto"
+                android:id="@+id/chipcloud_drill_tags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                />
+        </LinearLayout>
         <!--
         <TextView
             android:id="@+id/textSessionName"

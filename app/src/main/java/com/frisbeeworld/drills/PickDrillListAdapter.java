@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.adroitandroid.chipcloud.ChipCloud;
@@ -45,9 +46,18 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
     public static class DrillViewHolder extends RecyclerView.ViewHolder {
 
         public TextView textName;
+        public ImageView imagePreview;
+        public TextView textTiming;
+        public TextView textDescription;
+        public ChipCloud chipsTags;
+
         public DrillViewHolder(View v) {
             super(v);
             textName = (TextView)v.findViewById(R.id.text_drill_name);
+            imagePreview = (ImageView)v.findViewById(R.id.image_drill_preview);
+            textTiming = (TextView)v.findViewById(R.id.text_drill_timing);
+            textDescription = (TextView)v.findViewById(R.id.text_drill_description);
+            chipsTags = (ChipCloud)v.findViewById(R.id.chipcloud_drill_tags);
         }
     }
 
@@ -100,6 +110,12 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
 
             DrillViewHolder drillViewHolder = (DrillViewHolder)holder;
             drillViewHolder.textName.setText(theDrill.getName());
+            drillViewHolder.textDescription.setText(theDrill.getDescription());
+
+            String timing = Integer.toString(theDrill.getMinTime()) + " - " +
+                Integer.toString(theDrill.getMaxTime()) + " mins";
+            drillViewHolder.textTiming.setText(timing);
+            drillViewHolder.chipsTags.addChips(theDrill.getTags());
         }
     }
 
