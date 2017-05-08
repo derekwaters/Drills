@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         sessionsReference = firebaseDatabase.getReference().child("sessions");
+        firebaseDatabase.setPersistenceEnabled(true);
 
         this.mAuth = FirebaseAuth.getInstance();
         this.mAuthListener = new FirebaseAuth.AuthStateListener() {
