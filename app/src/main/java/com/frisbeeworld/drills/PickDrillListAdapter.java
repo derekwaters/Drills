@@ -91,18 +91,11 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
         if (position == 0)
         {
             TagViewHolder tagViewHolder = (TagViewHolder)holder;
-            tagViewHolder.chipCloud.addChip("kicking");
-            tagViewHolder.chipCloud.addChip("handball");
-            tagViewHolder.chipCloud.addChip("marking");
-            tagViewHolder.chipCloud.addChip("tackling");
-            tagViewHolder.chipCloud.addChip("pick-up");
-            tagViewHolder.chipCloud.addChip("junior");
-            tagViewHolder.chipCloud.addChip("senior");
-            tagViewHolder.chipCloud.addChip("quick");
-            tagViewHolder.chipCloud.addChip("fun");
-            tagViewHolder.chipCloud.addChip("game");
-            tagViewHolder.chipCloud.addChip("lines");
-            tagViewHolder.chipCloud.addChip("group");
+
+            for (String tagName : DrillsDatastore.getDatastore().getTags())
+            {
+                tagViewHolder.chipCloud.addChip(tagName);
+            }
         }
         else
         {
@@ -115,7 +108,13 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
             String timing = Integer.toString(theDrill.getMinTime()) + " - " +
                 Integer.toString(theDrill.getMaxTime()) + " mins";
             drillViewHolder.textTiming.setText(timing);
-            drillViewHolder.chipsTags.addChips(theDrill.getTags());
+            int index = 0;
+            for (String tagName : theDrill.getTags())
+            {
+                drillViewHolder.chipsTags.addChip(tagName);
+                drillViewHolder.chipsTags.setMode(ChipCloud.Mode.NONE);
+                index++;
+            }
         }
     }
 

@@ -2,6 +2,11 @@ package com.frisbeeworld.drills;
 
 import com.frisbeeworld.drills.database.Drill;
 import com.frisbeeworld.drills.database.Session;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -12,6 +17,10 @@ import java.util.ArrayList;
 public class DrillsDatastore {
 
     private static DrillsDatastore singleton;
+
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference drillsReference;
+    private ChildEventListener drillsEventListener;
 
     private Session currentSession;
     private ArrayList<Drill> drills;
@@ -47,12 +56,63 @@ public class DrillsDatastore {
     }
 
 
-    private DrillsDatastore()
-    {
+    private DrillsDatastore() {
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        drillsReference = firebaseDatabase.getReference().child("drills");
+        drillsEventListener = null;
+
         drills = new ArrayList<>();
         tags = new ArrayList<>();
+    }
 
-        Drill newDrill = new Drill();
+    public void setupDatabaseListeners() {
+        if (drillsEventListener == null) {
+            drillsEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    Drill newDrill = dataSnapshot.getValue(Drill.class);
+                    //newSession.setId(dataSnapshot.getKey());
+                    drills.add(newDrill);
+
+                    for (String tagName : newDrill.getTags())
+                    {
+                        if (!tags.contains(tagName))
+                        {
+                            tags.add(tagName);
+                        }
+                    }
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            };
+            drillsReference.addChildEventListener(drillsEventListener);
+        }
+    }
+
+    public void detachDatabaseListeners() {
+        if (drillsEventListener != null) {
+            drillsReference.removeEventListener(drillsEventListener);
+            drillsEventListener = null;
+        }
+    }
+
+/*
+
+    Drill newDrill = new Drill();
         newDrill.setId(1000);
         newDrill.setVideoUrl("http://www.youtube.com/");
         newDrill.setImageUrl("http://www.google.com/");
@@ -84,4 +144,5 @@ public class DrillsDatastore {
         tags.add("tackle");
         tags.add("pickup");
     }
+    */
 }

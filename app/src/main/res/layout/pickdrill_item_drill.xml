@@ -65,6 +65,10 @@
                 android:id="@+id/chipcloud_drill_tags"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                chipcloud:deselectedColor="@color/colorChipSelected"
+                chipcloud:selectedColor="@color/colorChipSelected"
+                chipcloud:selectedFontColor="@color/colorChipText"
+                chipcloud:deselectedFontColor="@color/colorChipText"
                 android:padding="8dp"
                 />
         </LinearLayout>

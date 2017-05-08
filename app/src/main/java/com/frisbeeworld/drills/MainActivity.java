@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.frisbeeworld.drills.database.Session;
@@ -59,8 +58,8 @@ public class MainActivity extends AppCompatActivity
         mCurrentUser = ANONYMOUS;
 
         firebaseDatabase = FirebaseDatabase.getInstance();
-        sessionsReference = firebaseDatabase.getReference().child("sessions");
         firebaseDatabase.setPersistenceEnabled(true);
+        sessionsReference = firebaseDatabase.getReference().child("sessions");
 
         this.mAuth = FirebaseAuth.getInstance();
         this.mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -70,7 +69,6 @@ public class MainActivity extends AppCompatActivity
                 if (user != null)
                 {
                     onSignedInInitialise(user.getDisplayName());
-                    Toast.makeText(MainActivity.this, "Welcome to Drills!", Toast.LENGTH_SHORT).show();
                     // We have a logged in user!
                     floatingActionButton.show();
                 }
@@ -247,6 +245,8 @@ public class MainActivity extends AppCompatActivity
             };
             sessionsReference.addChildEventListener(sessionEventListener);
         }
+
+        DrillsDatastore.getDatastore().setupDatabaseListeners();
     }
 
     private void onSignedOutCleanup()
@@ -263,6 +263,8 @@ public class MainActivity extends AppCompatActivity
             sessionsReference.removeEventListener(sessionEventListener);
             sessionEventListener = null;
         }
+
+        DrillsDatastore.getDatastore().detachDatabaseListeners();
     }
 
 }

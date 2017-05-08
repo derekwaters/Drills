@@ -1,11 +1,13 @@
 package com.frisbeeworld.drills.database;
 
+import java.util.ArrayList;
+
 public class Drill {
     private int id;
     private String name;
     private String videoUrl;
     private String imageUrl;
-    private String[] tags;
+    private ArrayList<String> tags;
     private int minTime;
     private int maxTime;
     private String description;
@@ -38,11 +40,11 @@ public class Drill {
         this.imageUrl = imageUrl;
     }
 
-    public String[] getTags() {
+    public ArrayList<String> getTags() {
         return tags;
     }
 
-    public void setTags(String[] tags) {
+    public void setTags(ArrayList<String> tags) {
         this.tags = tags;
     }
 
