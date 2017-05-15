@@ -67,7 +67,23 @@ public class Drill {
     public String getDescription() { return description; }
 
     public void setDescription(String desc) { this.description = desc; }
+
+
+    public boolean matchesTags(ArrayList<String> tags)
+    {
+        for (String checkTag : tags)
+        {
+            if (this.getTags().contains(checkTag))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /*
+
+
 
     id
 - videoLink

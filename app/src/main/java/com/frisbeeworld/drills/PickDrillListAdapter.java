@@ -11,6 +11,8 @@ import com.adroitandroid.chipcloud.ChipCloud;
 import com.adroitandroid.chipcloud.ChipListener;
 import com.frisbeeworld.drills.database.Drill;
 
+import java.util.ArrayList;
+
 /**
  * Created by Derek on 17/04/2017.
  */
@@ -20,8 +22,10 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
     private static final int VIEW_TYPE_TAG_HEADER = 1;
     private static final int VIEW_TYPE_DRILL = 2;
 
+    private ArrayList<Drill> filteredList;
+    private ArrayList<String> filterTags;
 
-    public static class TagViewHolder extends RecyclerView.ViewHolder {
+    public class TagViewHolder extends RecyclerView.ViewHolder {
 
         public ChipCloud chipCloud;
         public TagViewHolder(View v) {
@@ -32,12 +36,12 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
             chipCloud.setChipListener(new ChipListener() {
                 @Override
                 public void chipSelected(int i) {
-                    // TODO: filtering
+                    PickDrillListAdapter.this.addFilter(i);
                 }
 
                 @Override
                 public void chipDeselected(int i) {
-                    // TODO: filtering
+                    PickDrillListAdapter.this.removeFilter(i);
                 }
             });
         }
@@ -63,6 +67,39 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
 
 
     public PickDrillListAdapter() {
+        this.filteredList = new ArrayList<Drill>();
+        this.filterTags = new ArrayList<String>();
+
+        for (Drill eachDrill : DrillsDatastore.getDatastore().getDrills())
+        {
+            this.filteredList.add(eachDrill);
+        }
+    }
+
+    protected void addFilter (int i)
+    {
+        this.filterTags.add(DrillsDatastore.getDatastore().getTags().get(i));
+        this.applyListFilters();
+    }
+
+    protected void removeFilter (int i)
+    {
+        this.filterTags.remove(DrillsDatastore.getDatastore().getTags().get(i));
+        this.applyListFilters();
+    }
+
+    protected void applyListFilters ()
+    {
+        this.filteredList.clear();
+        for (Drill eachDrill : DrillsDatastore.getDatastore().getDrills())
+        {
+            if (this.filterTags.size() == 0 ||
+                    eachDrill.matchesTags(this.filterTags))
+            {
+                this.filteredList.add(eachDrill);
+            }
+        }
+        notifyDataSetChanged();
     }
 
     @Override
@@ -99,7 +136,7 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
         else
         {
-            Drill theDrill = DrillsDatastore.getDatastore().getDrills().get(position - 1);
+            Drill theDrill = this.filteredList.get(position - 1);
 
             DrillViewHolder drillViewHolder = (DrillViewHolder)holder;
             drillViewHolder.textName.setText(theDrill.getName());
@@ -120,6 +157,6 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public int getItemCount() {
-        return DrillsDatastore.getDatastore().getDrills().size() + 1;
+        return this.filteredList.size() + 1;
     }
 }
