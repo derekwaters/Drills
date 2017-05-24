@@ -22,8 +22,11 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
     private static final int VIEW_TYPE_TAG_HEADER = 1;
     private static final int VIEW_TYPE_DRILL = 2;
 
+    private RecyclerView parentRecyclerView;
     private ArrayList<Drill> filteredList;
     private ArrayList<String> filterTags;
+    private DrillOnClickListener onClickListener;
+    private PickDrillsActivity parentActivity;
 
     public class TagViewHolder extends RecyclerView.ViewHolder {
 
@@ -47,6 +50,14 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
+    public class DrillOnClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            PickDrillListAdapter.this.onDrillClicked(v);
+        }
+    }
+
     public static class DrillViewHolder extends RecyclerView.ViewHolder {
 
         public TextView textName;
@@ -66,14 +77,22 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
 
-    public PickDrillListAdapter() {
+    public PickDrillListAdapter(PickDrillsActivity parent) {
         this.filteredList = new ArrayList<Drill>();
         this.filterTags = new ArrayList<String>();
+        this.onClickListener = new DrillOnClickListener();
+        this.parentActivity = parent;
 
         for (Drill eachDrill : DrillsDatastore.getDatastore().getDrills())
         {
             this.filteredList.add(eachDrill);
         }
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        parentRecyclerView = recyclerView;
     }
 
     protected void addFilter (int i)
@@ -86,6 +105,15 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
     {
         this.filterTags.remove(DrillsDatastore.getDatastore().getTags().get(i));
         this.applyListFilters();
+    }
+
+    public void onDrillClicked (View v)
+    {
+        int itemPosition = parentRecyclerView.getChildLayoutPosition(v);
+
+        Drill theDrill = this.filteredList.get(itemPosition - 1);
+
+        parentActivity.returnResult(theDrill);
     }
 
     protected void applyListFilters ()
@@ -113,6 +141,7 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
             case VIEW_TYPE_DRILL:
                 newView = LayoutInflater.from(parent.getContext()).
                         inflate(R.layout.pickdrill_item_drill, parent, false);
+                newView.setOnClickListener(this.onClickListener);
                 return new DrillViewHolder(newView);
         }
         return null;

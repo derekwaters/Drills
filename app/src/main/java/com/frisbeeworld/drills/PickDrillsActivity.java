@@ -1,5 +1,6 @@
 package com.frisbeeworld.drills;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PickDrillsActivity extends AppCompatActivity {
+
+    public static final String SELECTED_DRILL_ID = "SELECTED_DRILL_ID";
 
     private RecyclerView drillsList;
     private RecyclerView.Adapter drillsAdapter;
@@ -33,7 +36,7 @@ public class PickDrillsActivity extends AppCompatActivity {
         drillsLayoutManager = new LinearLayoutManager(this);
         drillsList.setLayoutManager(drillsLayoutManager);
 
-        drillsAdapter = new PickDrillListAdapter();
+        drillsAdapter = new PickDrillListAdapter(this);
         drillsList.setAdapter(drillsAdapter);
 
         drillsList.setOnClickListener(new View.OnClickListener() {
@@ -43,5 +46,15 @@ public class PickDrillsActivity extends AppCompatActivity {
                 Toast.makeText(PickDrillsActivity.this, "Card selected?!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void returnResult (Drill selectedDrill)
+    {
+        Bundle conData = new Bundle();
+        conData.putInt(SELECTED_DRILL_ID, selectedDrill.getId());
+        Intent intent = new Intent();
+        intent.putExtras(conData);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }
