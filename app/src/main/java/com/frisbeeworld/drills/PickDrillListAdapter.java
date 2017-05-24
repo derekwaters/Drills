@@ -129,9 +129,13 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
         {
             TagViewHolder tagViewHolder = (TagViewHolder)holder;
 
-            for (String tagName : DrillsDatastore.getDatastore().getTags())
+            if (tagViewHolder.chipCloud.getChildCount() == 0)
             {
-                tagViewHolder.chipCloud.addChip(tagName);
+                for (String tagName : DrillsDatastore.getDatastore().getTags())
+                {
+                    tagViewHolder.chipCloud.addChip(tagName);
+                    tagViewHolder.chipCloud.setMode(ChipCloud.Mode.MULTI);
+                }
             }
         }
         else
@@ -146,11 +150,13 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
                 Integer.toString(theDrill.getMaxTime()) + " mins";
             drillViewHolder.textTiming.setText(timing);
             int index = 0;
-            for (String tagName : theDrill.getTags())
-            {
-                drillViewHolder.chipsTags.addChip(tagName);
-                drillViewHolder.chipsTags.setMode(ChipCloud.Mode.NONE);
-                index++;
+            if (drillViewHolder.chipsTags.getChildCount() == 0) {
+                drillViewHolder.chipsTags.removeAllViews();
+                for (String tagName : theDrill.getTags()) {
+                    drillViewHolder.chipsTags.addChip(tagName);
+                    drillViewHolder.chipsTags.setMode(ChipCloud.Mode.NONE);
+                    index++;
+                }
             }
         }
     }
