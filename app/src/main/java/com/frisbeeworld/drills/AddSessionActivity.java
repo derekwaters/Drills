@@ -46,7 +46,9 @@ public class AddSessionActivity extends AppCompatActivity {
                 addSession.setLocation("Koornang Park");
                 addSession.setName(textSessionName.getText().toString());
 
-                sessionsReference.push().setValue(addSession);
+                DatabaseReference newSession = sessionsReference.push();
+                addSession.setId(newSession.getKey());
+                newSession.setValue(addSession);
 
                 finish();
             }
