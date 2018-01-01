@@ -10,9 +10,6 @@ import android.widget.Toast;
 
 import com.frisbeeworld.drills.database.Drill;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PickDrillsActivity extends AppCompatActivity {
 
     public static final String SELECTED_DRILL_ID = "SELECTED_DRILL_ID";
@@ -26,7 +23,6 @@ public class PickDrillsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pick_drills);
 
-        List<Drill> drillList = new ArrayList<>();
         drillsList = (RecyclerView)findViewById(R.id.pickdrill_list);
 
         // This can improve performance if content changes don't change
@@ -51,7 +47,7 @@ public class PickDrillsActivity extends AppCompatActivity {
     public void returnResult (Drill selectedDrill)
     {
         Bundle conData = new Bundle();
-        conData.putInt(SELECTED_DRILL_ID, selectedDrill.getId());
+        conData.putString(SELECTED_DRILL_ID, selectedDrill.getId());
         Intent intent = new Intent();
         intent.putExtras(conData);
         setResult(RESULT_OK, intent);

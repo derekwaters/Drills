@@ -20,10 +20,6 @@ import com.firebase.ui.auth.AuthUI;
 import com.frisbeeworld.drills.database.Session;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
@@ -43,8 +39,6 @@ public class MainActivity extends AppCompatActivity
     private String mCurrentUser;
 
     private FirebaseDatabase firebaseDatabase;
-    private DatabaseReference sessionsReference;
-    private ChildEventListener sessionEventListener;
 
     private FloatingActionButton floatingActionButton;
 
@@ -56,10 +50,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         mCurrentUser = ANONYMOUS;
-
-        firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseDatabase.setPersistenceEnabled(true);
-        sessionsReference = firebaseDatabase.getReference().child("sessions");
 
         this.mAuth = FirebaseAuth.getInstance();
         this.mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -221,32 +211,7 @@ public class MainActivity extends AppCompatActivity
 
     private void attachDatabaseReadListener()
     {
-        if (sessionEventListener == null)
-        {
-            sessionEventListener = new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    Session newSession = dataSnapshot.getValue(Session.class);
-                    //newSession.setId(dataSnapshot.getKey());
-                    sessionAdapter.add(newSession);
-                }
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                }
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-                }
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            };
-            sessionsReference.addChildEventListener(sessionEventListener);
-        }
-
-        DrillsDatastore.getDatastore().setupDatabaseListeners();
+        DrillsDatastore.getDatastore().setupDatabaseListeners(sessionAdapter);
     }
 
     private void onSignedOutCleanup()
@@ -258,13 +223,6 @@ public class MainActivity extends AppCompatActivity
 
     private void detachDatabaseReadListener()
     {
-        if (sessionEventListener != null)
-        {
-            sessionsReference.removeEventListener(sessionEventListener);
-            sessionEventListener = null;
-        }
-
         DrillsDatastore.getDatastore().detachDatabaseListeners();
     }
-
 }
