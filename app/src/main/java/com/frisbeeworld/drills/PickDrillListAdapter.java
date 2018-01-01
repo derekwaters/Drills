@@ -63,6 +63,7 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
         public TextView textName;
         public ImageView imagePreview;
         public TextView textTiming;
+        public TextView textPeople;
         public TextView textDescription;
         public ChipCloud chipsTags;
 
@@ -71,6 +72,7 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
             textName = (TextView)v.findViewById(R.id.text_drill_name);
             imagePreview = (ImageView)v.findViewById(R.id.image_drill_preview);
             textTiming = (TextView)v.findViewById(R.id.text_drill_timing);
+            textPeople = (TextView)v.findViewById(R.id.text_drill_people);
             textDescription = (TextView)v.findViewById(R.id.text_drill_description);
             chipsTags = (ChipCloud)v.findViewById(R.id.chipcloud_drill_tags);
         }
@@ -178,6 +180,7 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
             String timing = Integer.toString(theDrill.getMinTime()) + " - " +
                 Integer.toString(theDrill.getMaxTime()) + " mins";
             drillViewHolder.textTiming.setText(timing);
+            drillViewHolder.textPeople.setText(Integer.toString(theDrill.getPeople()));
             int index = 0;
             if (drillViewHolder.chipsTags.getChildCount() == 0) {
                 drillViewHolder.chipsTags.removeAllViews();

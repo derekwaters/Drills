@@ -1,26 +1,28 @@
 package com.frisbeeworld.drills.database;
 
+import com.google.firebase.database.Exclude;
+
 public class DrillActivity {
-    private int id;
-    private int drillId;
+    private String id;
+    private String drillId;
     private int groupId;
-    private int sessionId;
     private int duration;
     private String notes;
 
-    public int getId() {
+    @Exclude
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public int getDrillId() {
+    public String getDrillId() {
         return drillId;
     }
 
-    public void setDrillId(int drillId) {
+    public void setDrillId(String drillId) {
         this.drillId = drillId;
     }
 
@@ -30,14 +32,6 @@ public class DrillActivity {
 
     public void setGroupId(int groupId) {
         this.groupId = groupId;
-    }
-
-    public int getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(int sessionId) {
-        this.sessionId = sessionId;
     }
 
     public int getDuration() {

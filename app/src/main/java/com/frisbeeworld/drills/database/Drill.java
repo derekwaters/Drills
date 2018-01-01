@@ -1,9 +1,11 @@
 package com.frisbeeworld.drills.database;
 
+import com.google.firebase.database.Exclude;
+
 import java.util.ArrayList;
 
 public class Drill {
-    private int id;
+    private String id;
     private String name;
     private String videoUrl;
     private String imageUrl;
@@ -11,12 +13,14 @@ public class Drill {
     private int minTime;
     private int maxTime;
     private String description;
+    private int people;
 
-    public int getId() {
+    @Exclude
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -68,6 +72,9 @@ public class Drill {
 
     public void setDescription(String desc) { this.description = desc; }
 
+    public int getPeople() { return this.people; }
+
+    public void setPeople(int people) { this.people = people; }
 
     public boolean matchesTags(ArrayList<String> tags)
     {
