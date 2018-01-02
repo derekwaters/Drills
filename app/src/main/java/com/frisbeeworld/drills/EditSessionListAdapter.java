@@ -1,6 +1,7 @@
 package com.frisbeeworld.drills;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +18,11 @@ import com.frisbeeworld.drills.database.Session;
  * Created by Derek on 31/12/2017.
  */
 
+
 public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int VIEW_TYPE_ACTIVITY = 1;
+    private static final int VIEW_TYPE_HEADER = 2;
 
     private RecyclerView parentRecyclerView;
     private ActivityOnClickListener onClickListener;
@@ -74,8 +77,57 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             btnEdit = (Button)v.findViewById(R.id.activity_edit_btn);
             btnRemove = (Button)v.findViewById(R.id.activity_remove_btn);
         }
+
+        public void refreshActivityInfo (DrillActivity activity) {
+            Drill theDrill = DrillsDatastore.getDatastore().getDrill(activity.getDrillId());
+
+            textName.setText(theDrill.getName());
+            textDescription.setText(theDrill.getDescription());
+
+            String timing = Integer.toString(theDrill.getMinTime()) + " - " +
+                    Integer.toString(theDrill.getMaxTime()) + " mins";
+            textTiming.setText(timing);
+            textPeople.setText(Integer.toString(theDrill.getPeople()));
+            // btnEdit.setOnClickListener(EditSessionListAdapter.this.onEditActivityListener);
+            // btnRemove.setOnClickListener(this.onRemoveActivityListener);
+            int index = 0;
+            if (chipsTags.getChildCount() == 0) {
+                chipsTags.removeAllViews();
+                for (String tagName : theDrill.getTags()) {
+                    chipsTags.addChip(tagName);
+                    chipsTags.setMode(ChipCloud.Mode.NONE);
+                    index++;
+                }
+            }
+        }
     }
 
+    public static class HeaderViewHolder extends RecyclerView.ViewHolder {
+
+        public TextView textSessionName;
+        public TextView textSessionLocation;
+        public TextView textSessionDateTime;
+        public TextView textSessionDuration;
+
+        public void refreshHeaderInfo (Session currentSession)
+        {
+            this.textSessionName.setText(currentSession.getName());
+            this.textSessionLocation.setText(currentSession.getLocation());
+            this.textSessionDateTime.setText(currentSession.getStartTimeString());
+            this.textSessionDuration.setText(Session.formatDuration(currentSession.getDuration()));
+        }
+
+        public HeaderViewHolder(View v) {
+            super(v);
+
+            textSessionName = (TextView)v.findViewById(R.id.text_session_name);
+            textSessionLocation = (TextView)v.findViewById(R.id.text_session_location);
+            textSessionLocation.setClickable(true);
+            textSessionLocation.setMovementMethod(LinkMovementMethod.getInstance());
+            textSessionDateTime = (TextView)v.findViewById(R.id.text_session_datetime);
+            textSessionDuration = (TextView)v.findViewById(R.id.text_session_duration);
+        }
+    }
 
     public EditSessionListAdapter(EditSessionActivity parent) {
         this.onClickListener = new ActivityOnClickListener();
@@ -109,7 +161,7 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         int itemPosition = parentRecyclerView.getChildLayoutPosition(v);
 
         Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
-        currentSession.getActivities().remove(itemPosition);
+        currentSession.getActivities().remove(itemPosition - 1);
     }
 
     @Override
@@ -119,48 +171,51 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             case VIEW_TYPE_ACTIVITY:
                 newView = LayoutInflater.from(parent.getContext()).
                         inflate(R.layout.editsession_item_drillactivity, parent, false);
-                newView.setOnClickListener(this.onClickListener);
+                // newView.setOnClickListener(this.onClickListener);
                 return new ActivityViewHolder(newView);
+            case VIEW_TYPE_HEADER:
+                newView = LayoutInflater.from(parent.getContext()).
+                        inflate(R.layout.editsession_item_header, parent, false);
+                // newView.setOnClickListener(this.onClickListener);
+                return new HeaderViewHolder(newView);
         }
         return null;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return VIEW_TYPE_ACTIVITY;
+        if (position == 0)
+        {
+            return VIEW_TYPE_HEADER;
+        }
+        else
+        {
+            return VIEW_TYPE_ACTIVITY;
+        }
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
         Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
-        DrillActivity activity = currentSession.getActivities().get(position);
-        Drill theDrill = DrillsDatastore.getDatastore().getDrill(activity.getDrillId());
 
-        ActivityViewHolder activityViewHolder = (ActivityViewHolder)holder;
-        activityViewHolder.textName.setText(theDrill.getName());
-        activityViewHolder.textDescription.setText(theDrill.getDescription());
+        if (position == 0)
+        {
+            HeaderViewHolder header = (HeaderViewHolder)holder;
+            header.refreshHeaderInfo(currentSession);
+        }
+        else
+        {
+            DrillActivity activity = currentSession.getActivities().get(position - 1);
 
-        String timing = Integer.toString(theDrill.getMinTime()) + " - " +
-                Integer.toString(theDrill.getMaxTime()) + " mins";
-        activityViewHolder.textTiming.setText(timing);
-        activityViewHolder.textPeople.setText(Integer.toString(theDrill.getPeople()));
-        activityViewHolder.btnEdit.setOnClickListener(this.onEditActivityListener);
-        activityViewHolder.btnRemove.setOnClickListener(this.onRemoveActivityListener);
-        int index = 0;
-        if (activityViewHolder.chipsTags.getChildCount() == 0) {
-            activityViewHolder.chipsTags.removeAllViews();
-            for (String tagName : theDrill.getTags()) {
-                activityViewHolder.chipsTags.addChip(tagName);
-                activityViewHolder.chipsTags.setMode(ChipCloud.Mode.NONE);
-                index++;
-            }
+            ActivityViewHolder activityView = (ActivityViewHolder)holder;
+            activityView.refreshActivityInfo(activity);
         }
     }
 
     @Override
     public int getItemCount() {
         Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
-        return currentSession.getActivities().size();
+        return currentSession.getActivities().size() + 1;
     }
 }

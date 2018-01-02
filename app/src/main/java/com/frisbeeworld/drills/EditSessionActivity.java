@@ -16,6 +16,8 @@ import com.frisbeeworld.drills.database.Session;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import static com.frisbeeworld.drills.R.id.textSessionLocation;
+
 public class EditSessionActivity extends AppCompatActivity {
 
     private static final int RC_PICK_DRILLS = 1;
@@ -24,10 +26,6 @@ public class EditSessionActivity extends AppCompatActivity {
     private RecyclerView.Adapter sessionAdapter;
     private RecyclerView.LayoutManager sessionLayoutManager;
 
-    private TextView textSessionName;
-    private TextView textSessionLocation;
-    private TextView textSessionDateTime;
-    private TextView textSessionDuration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,16 +49,6 @@ public class EditSessionActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(currentSession.getName());
 
 
-        textSessionName = (TextView)findViewById(R.id.text_session_name);
-        textSessionLocation = (TextView)findViewById(R.id.text_session_location);
-        textSessionLocation.setClickable(true);
-        textSessionLocation.setMovementMethod(LinkMovementMethod.getInstance());
-        textSessionDateTime = (TextView)findViewById(R.id.text_session_datetime);
-        textSessionDuration = (TextView)findViewById(R.id.text_session_duration);
-
-        this.refreshHeaderInfo();
-
-
 
         sessionList = (RecyclerView)findViewById(R.id.sessionactivity_list);
 
@@ -81,18 +69,6 @@ public class EditSessionActivity extends AppCompatActivity {
                 Toast.makeText(EditSessionActivity.this, "Activity selected?!", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    protected void refreshHeaderInfo ()
-    {
-        Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
-
-        this.textSessionName.setText(currentSession.getName());
-        this.textSessionLocation.setText(currentSession.getLocation());
-        this.textSessionDateTime.setText(currentSession.getStartTimeString());
-        this.textSessionDuration.setText(Session.formatDuration(currentSession.getDuration()));
-
-
     }
 
     @Override
