@@ -79,9 +79,9 @@ public class EditSessionActivity extends AppCompatActivity {
 
                 switch (requestCode) {
                     case RC_NEW_ACTIVITY:
-                        currentSession.addActivity(newDrillId, newDuration, newNotes);
+                        DrillActivity newActivity = currentSession.addActivity(newDrillId, newDuration, newNotes);
 
-                        DrillsDatastore.getDatastore().updateSession(currentSession);
+                        DrillsDatastore.getDatastore().updateActivity(currentSession, newActivity);
 
                         sessionAdapter = new EditSessionListAdapter(this);
                         sessionList.setAdapter(sessionAdapter);
@@ -95,7 +95,7 @@ public class EditSessionActivity extends AppCompatActivity {
                         updateActivity.setDuration(newDuration);
                         updateActivity.setNotes(newNotes);
 
-                        DrillsDatastore.getDatastore().updateSession(currentSession);
+                        DrillsDatastore.getDatastore().updateActivity(currentSession, updateActivity);
 
                         sessionAdapter = new EditSessionListAdapter(this);
                         sessionList.setAdapter(sessionAdapter);
@@ -118,5 +118,11 @@ public class EditSessionActivity extends AppCompatActivity {
         Intent editActivityIntent = new Intent(getApplicationContext(), EditActivityActivity.class);
         editActivityIntent.putExtra(EditActivityActivity.ACTIVITY_ID, activity.getId());
         startActivityForResult(editActivityIntent, RC_EDIT_ACTIVITY);
+    }
+
+    public void removeActivity (int position)
+    {
+        Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
+        currentSession.removeActivity(position);
     }
 }

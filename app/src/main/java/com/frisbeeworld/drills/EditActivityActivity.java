@@ -94,6 +94,8 @@ public class EditActivityActivity extends AppCompatActivity {
         this.setSelectedDrill(null);
 
         this.editActivity = null;
+        this.editNotes.setText("");
+        this.editDrillName.setEnabled(false);
 
         // Determine if this is an add or edit
         String activityTitle = getResources().getString(R.string.new_activity_title);
@@ -143,7 +145,7 @@ public class EditActivityActivity extends AppCompatActivity {
             drillName = this.selectedDrill.getName();
             minDuration = this.selectedDrill.getMinTime();
             maxDuration = this.selectedDrill.getMaxTime();
-            recommendedRange = "Recommended: " + this.selectedDrill.getTimingLabel();
+            recommendedRange = "( " + this.selectedDrill.getTimingLabel() + " )";
             duration = minDuration;
         }
 

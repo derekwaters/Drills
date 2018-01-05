@@ -102,6 +102,24 @@ public class DrillsDatastore {
         return newActivity;
     }
 
+    public DrillActivity updateActivity (Session session, DrillActivity activity) {
+
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference activRef = db.getReference().child("sessions").
+                child(session.getId()).child("activities").child(activity.getId());
+        activRef.setValue(activity);
+        return activity;
+    }
+
+    public DrillActivity removeActivity (Session session, DrillActivity activity) {
+
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference activRef = db.getReference().child("sessions").
+                child(session.getId()).child("activities").child(activity.getId());
+        activRef.removeValue();
+        return activity;
+    }
+
     public void setupDatabaseListeners(final SessionAdapter sessionAdapter) {
         if (drillsEventListener == null) {
             drillsEventListener = new ChildEventListener() {

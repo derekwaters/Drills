@@ -136,8 +136,7 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     public void onRemoveActivity (int position)
     {
-        Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
-        currentSession.removeActivity(position);
+        parentActivity.removeActivity(position);
         this.notifyItemRemoved(position);
         this.notifyDataSetChanged();
     }
@@ -184,7 +183,7 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
         else
         {
-            DrillActivity activity = currentSession.getActivities().get(position - 1);
+            DrillActivity activity = currentSession.getActivity(position - 1);
 
             ActivityViewHolder activityView = (ActivityViewHolder)holder;
             activityView.refreshActivityInfo(activity, position - 1);

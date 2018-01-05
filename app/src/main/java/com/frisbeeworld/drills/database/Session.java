@@ -1,13 +1,13 @@
 package com.frisbeeworld.drills.database;
 
 
-import android.util.Log;
-
 import com.frisbeeworld.drills.DrillsDatastore;
 import com.google.firebase.database.Exclude;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Set;
 
 public class Session {
 
@@ -16,11 +16,11 @@ public class Session {
     private String name;
     private String location;
     private Date startTime;
-    private ArrayList<DrillActivity> activities;
+    private HashMap<String, DrillActivity> activities;
 
     public Session()
     {
-        this.activities = new ArrayList<>();
+        this.activities = new HashMap<>();
     }
 
     @Exclude
@@ -66,20 +66,15 @@ public class Session {
 
     public int getDuration() {
         int duration = 0;
-        for (DrillActivity activity: this.activities)
+        Collection<DrillActivity> activities = this.activities.values();
+        for (DrillActivity activity: activities)
         {
             duration += activity.getDuration();
         }
         return duration;
     }
 
-    public ArrayList<DrillActivity> getActivities() { return activities; }
-
-    public void removeActivity (int position)
-    {
-        DrillActivity removed = this.activities.remove(position);
-        Log.v("Drills", "removed item " + removed.getDrillId());
-    }
+    public HashMap<String, DrillActivity> getActivities() { return activities; }
 
     public String getStartTimeString ()
     {
@@ -98,7 +93,7 @@ public class Session {
         return result;
     }
 
-    public void addActivity(String drillId, int duration, String notes)
+    public DrillActivity addActivity(String drillId, int duration, String notes)
     {
         Drill theDrill = DrillsDatastore.getDatastore().getDrill(drillId);
 
@@ -108,23 +103,38 @@ public class Session {
         newActivity.setDuration(duration);
         newActivity.setNotes(notes);
         newActivity.setDrillId(theDrill.getId());
-        this.activities.add(newActivity);
+        this.activities.put(theDrill.getId(), newActivity);
+
+        return newActivity;
+    }
+
+    public void removeActivity (int position)
+    {
+        Set<String> keys = this.activities.keySet();
+        String removeKey = (String)keys.toArray()[position];
+
+        DrillActivity theActivity = this.activities.get(removeKey);
+
+        this.activities.remove(removeKey);
+
+        DrillsDatastore.getDatastore().removeActivity(
+                DrillsDatastore.getDatastore().getCurrentSession(),
+                theActivity);
     }
 
     public DrillActivity getActivity (int position)
     {
-        return this.activities.get(position);
+        Set<String> keys = this.activities.keySet();
+        String findKey = (String)keys.toArray()[position];
+
+        DrillActivity result = this.activities.get(findKey);
+        result.setId(findKey);
+
+        return result;
     }
 
     public DrillActivity findActivity (String id)
     {
-        for (DrillActivity activity : this.activities)
-        {
-            if (activity.getId() == id)
-            {
-                return activity;
-            }
-        }
-        return null;
+        return this.activities.get(id);
     }
 }
