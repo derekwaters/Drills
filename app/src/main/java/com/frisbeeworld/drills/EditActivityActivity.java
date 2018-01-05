@@ -121,7 +121,10 @@ public class EditActivityActivity extends AppCompatActivity {
         {
             conData.putString(ACTIVITY_ID, this.editActivity.getId());
         }
-        conData.putString(SELECTED_DRILL_ID, selectedDrill.getId());
+        if (selectedDrill != null)
+        {
+            conData.putString(ACTIVITY_DRILL_ID, selectedDrill.getId());
+        }
         conData.putInt(ACTIVITY_DURATION, seekDuration.getProgress());
         conData.putString(ACTIVITY_NOTES, editNotes.getText().toString());
         Intent intent = new Intent();

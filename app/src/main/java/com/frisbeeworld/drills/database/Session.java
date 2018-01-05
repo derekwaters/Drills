@@ -95,15 +95,13 @@ public class Session {
 
     public DrillActivity addActivity(String drillId, int duration, String notes)
     {
-        Drill theDrill = DrillsDatastore.getDatastore().getDrill(drillId);
-
         DrillActivity newActivity = DrillsDatastore.getDatastore().addActivity(
                 DrillsDatastore.getDatastore().getCurrentSession());
 
         newActivity.setDuration(duration);
         newActivity.setNotes(notes);
-        newActivity.setDrillId(theDrill.getId());
-        this.activities.put(theDrill.getId(), newActivity);
+        newActivity.setDrillId(drillId);
+        this.activities.put(drillId, newActivity);
 
         return newActivity;
     }
