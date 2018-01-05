@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.frisbeeworld.drills.EditActivityActivity"
+    tools:showIn="@layout/activity_edit_activity"
+    tools:layout_editor_absoluteY="81dp"
+    tools:layout_editor_absoluteX="0dp">
+
+    <TextView
+        android:id="@+id/textNotesLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Notes"
+        android:layout_marginTop="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/editNotes"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="@+id/editNotes" />
+
+    <TextView
+        android:id="@+id/textDurationLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Duration"
+        android:layout_marginTop="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/seekBarDuration"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="@+id/seekBarDuration" />
+
+    <EditText
+        android:id="@+id/editDrillName"
+        android:layout_width="235dp"
+        android:layout_height="wrap_content"
+        android:editable="false"
+        android:ems="10"
+        android:inputType="text"
+        android:text="Name"
+        android:layout_marginLeft="16dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/btnPickDrill"
+        android:layout_marginRight="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp"
+        app:layout_constraintHorizontal_bias="0.333" />
+
+    <TextView
+        android:id="@+id/textNameLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Drill"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="@+id/editDrillName"
+        android:layout_marginTop="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/editDrillName" />
+
+    <Button
+        android:id="@+id/btnSaveDrill"
+        style="@android:style/Widget.Material.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/textNotesLabel"
+        android:layout_marginRight="16dp"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/btnPickDrill"
+        style="@android:style/Widget.Material.Button.Borderless.Colored"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SELECT"
+        android:layout_marginRight="16dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editDrillName"
+        android:layout_marginTop="0dp" />
+
+    <SeekBar
+        android:id="@+id/seekBarDuration"
+        android:layout_width="236dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/textNameLabel"
+        android:layout_marginLeft="0dp"
+        app:layout_constraintLeft_toLeftOf="@+id/editDrillName" />
+
+    <TextView
+        android:id="@+id/textDurationOutput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintTop_toTopOf="@+id/seekBarDuration"
+        android:layout_marginTop="0dp"
+        app:layout_constraintLeft_toRightOf="@+id/seekBarDuration"
+        android:layout_marginLeft="8dp" />
+
+    <TextView
+        android:id="@+id/textDurationRecommended"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="0dp"
+        android:text="TextView"
+        app:layout_constraintRight_toRightOf="@+id/seekBarDuration"
+        app:layout_constraintTop_toBottomOf="@+id/seekBarDuration" />
+
+    <EditText
+        android:id="@+id/editNotes"
+        android:layout_width="235dp"
+        android:layout_height="151dp"
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/textDurationLabel"
+        android:layout_marginLeft="0dp"
+        app:layout_constraintLeft_toLeftOf="@+id/seekBarDuration" />
+</android.support.constraint.ConstraintLayout>

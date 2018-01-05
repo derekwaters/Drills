@@ -1,6 +1,7 @@
 package com.frisbeeworld.drills;
 
 import com.frisbeeworld.drills.database.Drill;
+import com.frisbeeworld.drills.database.DrillActivity;
 import com.frisbeeworld.drills.database.Session;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -81,6 +82,24 @@ public class DrillsDatastore {
         tags = new ArrayList<>();
         sessions = new ArrayList<>();
         drillMap = new HashMap<>();
+    }
+
+    public void updateSession (Session session) {
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference sessionReference = db.getReference().child("sessions").
+                child(session.getId());
+        sessionReference.setValue(session);
+    }
+
+    public DrillActivity addActivity (Session session) {
+
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference activRef = db.getReference().child("sessions").
+                child(session.getId()).child("activities");
+        DatabaseReference newActivityRef = activRef.push();
+        DrillActivity newActivity = new DrillActivity();
+        newActivity.setId(newActivityRef.getKey());
+        return newActivity;
     }
 
     public void setupDatabaseListeners(final SessionAdapter sessionAdapter) {

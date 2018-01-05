@@ -41,7 +41,6 @@ public class AddSessionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Session addSession = new Session();
-                addSession.setDuration(60);
                 addSession.setStartTime(new Date());
                 addSession.setLocation("Koornang Park");
                 addSession.setName(textSessionName.getText().toString());

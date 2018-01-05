@@ -88,19 +88,9 @@ public class Drill {
         return false;
     }
 
-    /*
-
-
-
-    id
-- videoLink
-- imageLink
-- skills trained
-- time required (min - max?)
-- space required
-- equipment required
-- preparation
-- target age range
-    */
-
+    public String getTimingLabel ()
+    {
+        return Integer.toString(getMinTime()) + " - " +
+                Integer.toString(getMaxTime()) + " mins";
+    }
 }

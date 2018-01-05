@@ -6,10 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.adroitandroid.chipcloud.ChipCloud;
 import com.frisbeeworld.drills.database.Drill;
 import com.frisbeeworld.drills.database.DrillActivity;
 import com.frisbeeworld.drills.database.Session;
@@ -28,9 +26,6 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private ActivityOnClickListener onClickListener;
     private EditSessionActivity parentActivity;
 
-    private EditActivityOnClickListener onEditActivityListener;
-    private RemoveActivityOnClickListener onRemoveActivityListener;
-
     public class ActivityOnClickListener implements View.OnClickListener {
 
         @Override
@@ -39,66 +34,50 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
     }
 
-    public class EditActivityOnClickListener implements View.OnClickListener {
-
-        @Override
-        public void onClick(View v) {
-            EditSessionListAdapter.this.onEditActivity(v);
-        }
-    }
-
-    public class RemoveActivityOnClickListener implements View.OnClickListener {
-
-        @Override
-        public void onClick(View v) {
-            EditSessionListAdapter.this.onRemoveActivity(v);
-        }
-    }
-
-    public static class ActivityViewHolder extends RecyclerView.ViewHolder {
+    public class ActivityViewHolder extends RecyclerView.ViewHolder {
 
         public TextView textName;
-        public ImageView imagePreview;
+        public TextView textDescription;
+        public TextView textNotes;
         public TextView textTiming;
         public TextView textPeople;
-        public TextView textDescription;
         public Button btnEdit;
         public Button btnRemove;
-        public ChipCloud chipsTags;
+        public int currentPosition;
 
         public ActivityViewHolder(View v) {
             super(v);
             textName = (TextView)v.findViewById(R.id.text_drill_name);
-            imagePreview = (ImageView)v.findViewById(R.id.image_drill_preview);
+            textDescription = (TextView)v.findViewById(R.id.text_drill_description);
+            textNotes = (TextView)v.findViewById(R.id.text_drill_notes);
             textTiming = (TextView)v.findViewById(R.id.text_drill_timing);
             textPeople = (TextView)v.findViewById(R.id.text_drill_people);
-            textDescription = (TextView)v.findViewById(R.id.text_drill_description);
-            chipsTags = (ChipCloud)v.findViewById(R.id.chipcloud_drill_tags);
             btnEdit = (Button)v.findViewById(R.id.activity_edit_btn);
             btnRemove = (Button)v.findViewById(R.id.activity_remove_btn);
         }
 
-        public void refreshActivityInfo (DrillActivity activity) {
+        public void refreshActivityInfo (DrillActivity activity, int currentPosition) {
             Drill theDrill = DrillsDatastore.getDatastore().getDrill(activity.getDrillId());
 
+            this.currentPosition = currentPosition;
             textName.setText(theDrill.getName());
             textDescription.setText(theDrill.getDescription());
+            textNotes.setText(activity.getNotes());
 
-            String timing = Integer.toString(theDrill.getMinTime()) + " - " +
-                    Integer.toString(theDrill.getMaxTime()) + " mins";
-            textTiming.setText(timing);
+            textTiming.setText(Session.formatDuration(activity.getDuration()));
             textPeople.setText(Integer.toString(theDrill.getPeople()));
-            // btnEdit.setOnClickListener(EditSessionListAdapter.this.onEditActivityListener);
-            // btnRemove.setOnClickListener(this.onRemoveActivityListener);
-            int index = 0;
-            if (chipsTags.getChildCount() == 0) {
-                chipsTags.removeAllViews();
-                for (String tagName : theDrill.getTags()) {
-                    chipsTags.addChip(tagName);
-                    chipsTags.setMode(ChipCloud.Mode.NONE);
-                    index++;
+            btnEdit.setOnClickListener(new View.OnClickListener() {
+                   @Override
+                   public void onClick(View v) {
+                       EditSessionListAdapter.this.onEditActivity(ActivityViewHolder.this.currentPosition);
+                   }
+               });
+            btnRemove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EditSessionListAdapter.this.onRemoveActivity(ActivityViewHolder.this.currentPosition);
                 }
-            }
+            });
         }
     }
 
@@ -131,8 +110,6 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     public EditSessionListAdapter(EditSessionActivity parent) {
         this.onClickListener = new ActivityOnClickListener();
-        this.onEditActivityListener = new EditActivityOnClickListener();
-        this.onRemoveActivityListener = new RemoveActivityOnClickListener();
         this.parentActivity = parent;
     }
 
@@ -149,19 +126,20 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         // TODO: Implement something when hitting a card
     }
 
-    public void onEditActivity (View v)
+    public void onEditActivity (int position)
     {
-        int itemPosition = parentRecyclerView.getChildLayoutPosition(v);
+        Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
+        DrillActivity activity = currentSession.getActivity(position);
 
-        // TODO: Implement editing of the activity
+        parentActivity.editActivity(activity);
     }
 
-    public void onRemoveActivity (View v)
+    public void onRemoveActivity (int position)
     {
-        int itemPosition = parentRecyclerView.getChildLayoutPosition(v);
-
         Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
-        currentSession.getActivities().remove(itemPosition - 1);
+        currentSession.removeActivity(position);
+        this.notifyItemRemoved(position);
+        this.notifyDataSetChanged();
     }
 
     @Override
@@ -209,7 +187,7 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             DrillActivity activity = currentSession.getActivities().get(position - 1);
 
             ActivityViewHolder activityView = (ActivityViewHolder)holder;
-            activityView.refreshActivityInfo(activity);
+            activityView.refreshActivityInfo(activity, position - 1);
         }
     }
 

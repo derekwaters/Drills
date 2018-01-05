@@ -7,20 +7,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.method.LinkMovementMethod;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.frisbeeworld.drills.database.DrillActivity;
 import com.frisbeeworld.drills.database.Session;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import static com.frisbeeworld.drills.R.id.textSessionLocation;
 
 public class EditSessionActivity extends AppCompatActivity {
 
-    private static final int RC_PICK_DRILLS = 1;
+    private static final int RC_NEW_ACTIVITY = 1;
+    private static final int RC_EDIT_ACTIVITY = 2;
 
     private RecyclerView sessionList;
     private RecyclerView.Adapter sessionAdapter;
@@ -38,8 +34,7 @@ public class EditSessionActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent pickDrillsIntent = new Intent(getApplicationContext(), PickDrillsActivity.class);
-                startActivityForResult(pickDrillsIntent, RC_PICK_DRILLS);
+                addActivity();
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -73,20 +68,55 @@ public class EditSessionActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode)
-        {
-            case RC_PICK_DRILLS:
-                Bundle res = data.getExtras();
-                String pickedDrill = res.getString(PickDrillsActivity.SELECTED_DRILL_ID);
 
+        if (resultCode == RESULT_OK) {
+            Bundle res = data.getExtras();
+            if (res != null) {
+                String newDrillId = res.getString(EditActivityActivity.ACTIVITY_DRILL_ID);
+                int newDuration = res.getInt(EditActivityActivity.ACTIVITY_DURATION);
+                String newNotes = res.getString(EditActivityActivity.ACTIVITY_NOTES);
                 Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
-                currentSession.addDrill(pickedDrill);
 
-                FirebaseDatabase db = FirebaseDatabase.getInstance();
-                DatabaseReference sessionReference = db.getReference().child("sessions").
-                        child(currentSession.getId());
-                sessionReference.setValue(currentSession);
+                switch (requestCode) {
+                    case RC_NEW_ACTIVITY:
+                        currentSession.addActivity(newDrillId, newDuration, newNotes);
+
+                        DrillsDatastore.getDatastore().updateSession(currentSession);
+
+                        sessionAdapter = new EditSessionListAdapter(this);
+                        sessionList.setAdapter(sessionAdapter);
+                        break;
+
+                    case RC_EDIT_ACTIVITY:
+                        String activityId = res.getString(EditActivityActivity.ACTIVITY_ID);
+
+                        DrillActivity updateActivity = currentSession.findActivity(activityId);
+                        updateActivity.setDrillId(newDrillId);
+                        updateActivity.setDuration(newDuration);
+                        updateActivity.setNotes(newNotes);
+
+                        DrillsDatastore.getDatastore().updateSession(currentSession);
+
+                        sessionAdapter = new EditSessionListAdapter(this);
+                        sessionList.setAdapter(sessionAdapter);
+                        break;
+
+                }
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void addActivity ()
+    {
+        Intent editActivityIntent = new Intent(getApplicationContext(), EditActivityActivity.class);
+        startActivityForResult(editActivityIntent, RC_NEW_ACTIVITY);
+    }
+
+    public void editActivity (DrillActivity activity)
+    {
+        Intent editActivityIntent = new Intent(getApplicationContext(), EditActivityActivity.class);
+        editActivityIntent.putExtra(EditActivityActivity.ACTIVITY_ID, activity.getId());
+        startActivityForResult(editActivityIntent, RC_EDIT_ACTIVITY);
     }
 }

@@ -177,9 +177,7 @@ public class PickDrillListAdapter extends RecyclerView.Adapter<RecyclerView.View
             drillViewHolder.textName.setText(theDrill.getName());
             drillViewHolder.textDescription.setText(theDrill.getDescription());
 
-            String timing = Integer.toString(theDrill.getMinTime()) + " - " +
-                Integer.toString(theDrill.getMaxTime()) + " mins";
-            drillViewHolder.textTiming.setText(timing);
+            drillViewHolder.textTiming.setText(theDrill.getTimingLabel());
             drillViewHolder.textPeople.setText(Integer.toString(theDrill.getPeople()));
             int index = 0;
             if (drillViewHolder.chipsTags.getChildCount() == 0) {

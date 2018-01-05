@@ -35,38 +35,42 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 tools:text="DRILL NAME"/>
 
-            <ImageView
-                android:id="@+id/image_drill_preview"
-                android:layout_width="200dp"
-                android:layout_height="150dp"
-                android:layout_gravity="center"
-                android:background="@color/cardview_light_background"
-                android:padding="8dp" />
-
-            <LinearLayout
+            <TextView
+                android:id="@+id/text_drill_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <TextView
-                    android:id="@+id/text_drill_timing"
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:gravity="center_vertical"
-                    android:padding="4dp"
-                    android:drawableLeft="@drawable/ic_timer_black_24dp"
-                    android:drawablePadding="4dp"
-                    tools:text="NN - MM minutes"/>
-                <TextView
-                    android:id="@+id/text_drill_people"
-                    android:layout_width="wrap_content"
-                    android:layout_height="30dp"
-                    android:gravity="center_vertical"
-                    android:padding="4dp"
-                    android:drawableLeft="@drawable/ic_people_black_24dp"
-                    android:drawablePadding="4dp"
-                    tools:text="NN people"/>
-            </LinearLayout>
+                android:layout_gravity="start"
+                android:padding="8dp"
+                android:textAlignment="viewStart"
+                tools:text="A full description of the drill should go in here. Ideally we'd also have some nice info about how many people are needed to run the drill etc." />
 
+            <TextView
+                android:id="@+id/text_drill_notes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:padding="4dp"
+                android:drawableLeft="@drawable/ic_note_black_24dp"
+                android:drawablePadding="4dp"
+                tools:text="Notes"/>
+            <TextView
+                android:id="@+id/text_drill_timing"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
+                android:padding="4dp"
+                android:drawableLeft="@drawable/ic_timer_black_24dp"
+                android:drawablePadding="4dp"
+                tools:text="NN - MM minutes"/>
+            <TextView
+                android:id="@+id/text_drill_people"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
+                android:padding="4dp"
+                android:drawableLeft="@drawable/ic_people_black_24dp"
+                android:drawablePadding="4dp"
+                tools:text="NN people"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -98,26 +102,6 @@
                     android:text="Remove" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/text_drill_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:padding="8dp"
-                android:textAlignment="viewStart"
-                tools:text="A full description of the drill should go in here. Ideally we'd also have some nice info about how many people are needed to run the drill etc." />
-
-            <com.adroitandroid.chipcloud.ChipCloud
-                xmlns:chipcloud = "http://schemas.android.com/apk/res-auto"
-                android:id="@+id/chipcloud_drill_tags"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                chipcloud:deselectedColor="@color/colorChipSelected"
-                chipcloud:selectedColor="@color/colorChipSelected"
-                chipcloud:selectedFontColor="@color/colorChipText"
-                chipcloud:deselectedFontColor="@color/colorChipText"
-                android:padding="8dp"
-                />
         </LinearLayout>
         <!--
         <TextView

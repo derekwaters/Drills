@@ -1,6 +1,8 @@
 package com.frisbeeworld.drills.database;
 
 
+import android.util.Log;
+
 import com.frisbeeworld.drills.DrillsDatastore;
 import com.google.firebase.database.Exclude;
 
@@ -14,7 +16,6 @@ public class Session {
     private String name;
     private String location;
     private Date startTime;
-    private int duration;
     private ArrayList<DrillActivity> activities;
 
     public Session()
@@ -64,14 +65,21 @@ public class Session {
     }
 
     public int getDuration() {
+        int duration = 0;
+        for (DrillActivity activity: this.activities)
+        {
+            duration += activity.getDuration();
+        }
         return duration;
     }
 
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
     public ArrayList<DrillActivity> getActivities() { return activities; }
+
+    public void removeActivity (int position)
+    {
+        DrillActivity removed = this.activities.remove(position);
+        Log.v("Drills", "removed item " + removed.getDrillId());
+    }
 
     public String getStartTimeString ()
     {
@@ -90,13 +98,33 @@ public class Session {
         return result;
     }
 
-    public void addDrill(String drillId)
+    public void addActivity(String drillId, int duration, String notes)
     {
         Drill theDrill = DrillsDatastore.getDatastore().getDrill(drillId);
-        DrillActivity newActivity = new DrillActivity();
-        newActivity.setDuration((theDrill.getMaxTime() + theDrill.getMinTime()) / 2);
+
+        DrillActivity newActivity = DrillsDatastore.getDatastore().addActivity(
+                DrillsDatastore.getDatastore().getCurrentSession());
+
+        newActivity.setDuration(duration);
+        newActivity.setNotes(notes);
         newActivity.setDrillId(theDrill.getId());
-        this.duration += newActivity.getDuration();
         this.activities.add(newActivity);
+    }
+
+    public DrillActivity getActivity (int position)
+    {
+        return this.activities.get(position);
+    }
+
+    public DrillActivity findActivity (String id)
+    {
+        for (DrillActivity activity : this.activities)
+        {
+            if (activity.getId() == id)
+            {
+                return activity;
+            }
+        }
+        return null;
     }
 }
