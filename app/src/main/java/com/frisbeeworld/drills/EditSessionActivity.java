@@ -7,9 +7,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
 import com.frisbeeworld.drills.database.DrillActivity;
 import com.frisbeeworld.drills.database.Session;
 
@@ -44,7 +47,6 @@ public class EditSessionActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(currentSession.getName());
 
 
-
         sessionList = (RecyclerView)findViewById(R.id.sessionactivity_list);
 
         // This can improve performance if content changes don't change
@@ -64,6 +66,36 @@ public class EditSessionActivity extends AppCompatActivity {
                 Toast.makeText(EditSessionActivity.this, "Activity selected?!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.edit_session_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        switch (id)
+        {
+            case R.id.action_start:
+
+                return true;
+            case R.id.action_settings:
+                return true;
+            case R.id.action_sign_out:
+                AuthUI.getInstance().signOut(this);
+                finish();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

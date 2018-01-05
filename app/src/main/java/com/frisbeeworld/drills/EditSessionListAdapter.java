@@ -57,25 +57,30 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
 
         public void refreshActivityInfo (DrillActivity activity, int currentPosition) {
-            String drillName = "";
-            String drillDescription = "";
-            int people = 0;
 
             Drill theDrill = DrillsDatastore.getDatastore().getDrill(activity.getDrillId());
             if (theDrill != null)
             {
-                drillName = theDrill.getName();
-                drillDescription = theDrill.getDescription();
-                people = theDrill.getPeople();
+                textName.setVisibility(View.VISIBLE);
+                textDescription.setVisibility(View.VISIBLE);
+                textPeople.setVisibility(View.VISIBLE);
+                textName.setText(theDrill.getName());
+                textDescription.setText(theDrill.getDescription());
+                textPeople.setText(Integer.toString(theDrill.getPeople()));
+            }
+            else
+            {
+                textName.setVisibility(View.GONE);
+                textDescription.setVisibility(View.GONE);
+                textPeople.setVisibility(View.GONE);
+
             }
 
             this.currentPosition = currentPosition;
-            textName.setText(drillName);
-            textDescription.setText(drillDescription);
+
             textNotes.setText(activity.getNotes());
 
             textTiming.setText(Session.formatDuration(activity.getDuration()));
-            textPeople.setText(Integer.toString(people));
             btnEdit.setOnClickListener(new View.OnClickListener() {
                    @Override
                    public void onClick(View v) {
