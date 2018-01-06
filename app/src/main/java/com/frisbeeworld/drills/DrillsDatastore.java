@@ -84,6 +84,18 @@ public class DrillsDatastore {
         drillMap = new HashMap<>();
     }
 
+    public Session getSession (String sessionId)
+    {
+        for (Session checkSession: sessions)
+        {
+            if (checkSession.getId() == sessionId)
+            {
+                return checkSession;
+            }
+        }
+        return null;
+    }
+
     public void updateSession (Session session) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference sessionReference = db.getReference().child("sessions").

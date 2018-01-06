@@ -44,6 +44,11 @@
             android:name=".EditActivityActivity"
             android:label="@string/title_activity_edit_activity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".RunSessionActivity"
+            android:label="@string/title_activity_run_session"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <service android:name=".RunSessionActivity$TimerService" android:exported="false" />
     </application>
 
 </manifest>

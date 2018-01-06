@@ -85,7 +85,7 @@ public class EditSessionActivity extends AppCompatActivity {
         switch (id)
         {
             case R.id.action_start:
-
+                runSession();
                 return true;
             case R.id.action_settings:
                 return true;
@@ -156,5 +156,13 @@ public class EditSessionActivity extends AppCompatActivity {
     {
         Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
         currentSession.removeActivity(position);
+    }
+
+    public void runSession ()
+    {
+        Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
+        Intent runSessionIntent = new Intent(getApplicationContext(), RunSessionActivity.class);
+        runSessionIntent.putExtra(RunSessionActivity.SESSION_ID, currentSession.getId());
+        startActivity(runSessionIntent);
     }
 }
