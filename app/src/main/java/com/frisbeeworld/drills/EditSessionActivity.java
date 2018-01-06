@@ -160,9 +160,9 @@ public class EditSessionActivity extends AppCompatActivity {
 
     public void runSession ()
     {
-        Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
+        // Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
         Intent runSessionIntent = new Intent(getApplicationContext(), RunSessionActivity.class);
-        runSessionIntent.putExtra(RunSessionActivity.SESSION_ID, currentSession.getId());
+        // runSessionIntent.putExtra(RunSessionActivity.SESSION_ID, currentSession.getId());
         startActivity(runSessionIntent);
     }
 }

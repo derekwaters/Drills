@@ -16,8 +16,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.frisbeeworld.drills.database.DrillActivity;
 import com.frisbeeworld.drills.database.Session;
 
 import java.lang.ref.WeakReference;
@@ -35,6 +37,9 @@ public class RunSessionActivity extends AppCompatActivity {
     private boolean serviceBound;
 
     private TextView textTimer;
+    private TextView textTotalTime;
+    private TextView textRemainingTime;
+    private ProgressBar progressTimer;
     private ImageButton btnStartStop;
 
     // Handler to update the UI every second when the timer is running
@@ -48,16 +53,19 @@ public class RunSessionActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            String sessionId = extras.getString(SESSION_ID);
-            if (sessionId != null) {
-                session = DrillsDatastore.getDatastore().getSession(sessionId);
-            }
-        }
+        session = DrillsDatastore.getDatastore().getCurrentSession();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(session.getName());
 
         textTimer = (TextView)findViewById(R.id.txtTimer);
+        textTotalTime = (TextView)findViewById(R.id.txtTotalTime);
+        textRemainingTime = (TextView)findViewById(R.id.txtRemainingTime);
+        progressTimer = (ProgressBar)findViewById(R.id.progressTimer);
         btnStartStop = (ImageButton)findViewById(R.id.btnStartStop);
+
+        progressTimer.setMax(session.getDuration() * 60);
+        progressTimer.setProgress(0);
 
         btnStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,7 +142,27 @@ public class RunSessionActivity extends AppCompatActivity {
      */
     private void updateUITimer() {
         if (serviceBound) {
-            textTimer.setText(timerService.elapsedTime() + " seconds");
+            // Update all the bits and pieces.
+            long elapsedSeconds = timerService.elapsedTime();
+            progressTimer.setProgress((int)elapsedSeconds);
+            long totalSeconds = 60 * session.getDuration();
+            long remainingSeconds = totalSeconds - elapsedSeconds;
+            long remainingActivitySeconds;
+            // Now work out the remaining time in the current activity
+            int position = 0;
+            while (true)
+            {
+                DrillActivity activity = session.getActivity(position);
+                if (60 * activity.getDuration() > elapsedSeconds) {
+                    remainingActivitySeconds = (60 * activity.getDuration()) - elapsedSeconds;
+                    break;
+                } else {
+                    elapsedSeconds -= (60 * activity.getDuration());
+                }
+            }
+            textTimer.setText(Session.formatTimer(remainingActivitySeconds));
+            textTotalTime.setText(Session.formatTimer(totalSeconds));
+            textRemainingTime.setText(Session.formatTimer(remainingSeconds));
         }
     }
 
@@ -206,7 +234,6 @@ public class RunSessionActivity extends AppCompatActivity {
 
         private static final String TAG = TimerService.class.getSimpleName();
 
-        // Start and end times in milliseconds
         private long startTime, endTime;
 
         // Is the service tracking time?

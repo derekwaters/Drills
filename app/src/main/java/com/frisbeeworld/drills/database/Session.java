@@ -93,6 +93,11 @@ public class Session {
         return result;
     }
 
+    public static String formatTimer (long seconds)
+    {
+        return String.format("%d:%02d", seconds / 60, seconds % 60);
+    }
+
     public DrillActivity addActivity(String drillId, int duration, String notes)
     {
         DrillActivity newActivity = DrillsDatastore.getDatastore().addActivity(
