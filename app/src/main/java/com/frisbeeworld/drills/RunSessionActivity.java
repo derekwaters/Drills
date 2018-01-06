@@ -10,12 +10,12 @@ import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.frisbeeworld.drills.database.Session;
@@ -35,7 +35,7 @@ public class RunSessionActivity extends AppCompatActivity {
     private boolean serviceBound;
 
     private TextView textTimer;
-    private Button btnStartStop;
+    private ImageButton btnStartStop;
 
     // Handler to update the UI every second when the timer is running
     private final android.os.Handler updateTimeHandler = new UIUpdateHandler(this);
@@ -56,8 +56,8 @@ public class RunSessionActivity extends AppCompatActivity {
             }
         }
 
-        textTimer = (TextView)findViewById(R.id.txt_timer);
-        btnStartStop = (Button)findViewById(R.id.btn_start_stop);
+        textTimer = (TextView)findViewById(R.id.txtTimer);
+        btnStartStop = (ImageButton)findViewById(R.id.btnStartStop);
 
         btnStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
