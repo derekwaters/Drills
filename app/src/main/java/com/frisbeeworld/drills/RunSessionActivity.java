@@ -1,9 +1,11 @@
 package com.frisbeeworld.drills;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Binder;
@@ -12,6 +14,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -41,6 +44,8 @@ public class RunSessionActivity extends AppCompatActivity {
     private TextView textRemainingTime;
     private ProgressBar progressTimer;
     private ImageButton btnStartStop;
+    private RecyclerView listActivities;
+    private RunSessionListAdapter activityAdapter;
 
     // Handler to update the UI every second when the timer is running
     private final android.os.Handler updateTimeHandler = new UIUpdateHandler(this);
@@ -63,9 +68,14 @@ public class RunSessionActivity extends AppCompatActivity {
         textRemainingTime = (TextView)findViewById(R.id.txtRemainingTime);
         progressTimer = (ProgressBar)findViewById(R.id.progressTimer);
         btnStartStop = (ImageButton)findViewById(R.id.btnStartStop);
+        listActivities = (RecyclerView)findViewById(R.id.sessionactivity_list);
+
+        activityAdapter = new RunSessionListAdapter();
+        listActivities.setAdapter(activityAdapter);
 
         progressTimer.setMax(session.getDuration() * 60);
         progressTimer.setProgress(0);
+        updateSessionUI(0);
 
         btnStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,28 +154,45 @@ public class RunSessionActivity extends AppCompatActivity {
         if (serviceBound) {
             // Update all the bits and pieces.
             long elapsedSeconds = timerService.elapsedTime();
-            progressTimer.setProgress((int)elapsedSeconds);
-            long totalSeconds = 60 * session.getDuration();
-            long remainingSeconds = totalSeconds - elapsedSeconds;
-            long remainingActivitySeconds;
-            // Now work out the remaining time in the current activity
-            int position = 0;
-            while (true)
-            {
-                DrillActivity activity = session.getActivity(position);
-                if (60 * activity.getDuration() > elapsedSeconds) {
-                    remainingActivitySeconds = (60 * activity.getDuration()) - elapsedSeconds;
-                    break;
-                } else {
-                    elapsedSeconds -= (60 * activity.getDuration());
-                }
-            }
-            textTimer.setText(Session.formatTimer(remainingActivitySeconds));
-            textTotalTime.setText(Session.formatTimer(totalSeconds));
-            textRemainingTime.setText(Session.formatTimer(remainingSeconds));
+
+            this.updateSessionUI(elapsedSeconds);
+
         }
     }
 
+    private void updateSessionUI (long elapsedSeconds)
+    {
+        // DEBUG ONLY
+        elapsedSeconds = elapsedSeconds * 10;
+        // DEBUG ONLY
+        progressTimer.setProgress((int)elapsedSeconds);
+        long totalSeconds = 60 * session.getDuration();
+        long remainingSeconds = totalSeconds - elapsedSeconds;
+        long remainingActivitySeconds;
+        String currentActivity;
+        // Now work out the remaining time in the current activity
+        int position = 0;
+        while (true)
+        {
+            DrillActivity activity = session.getActivity(position);
+            if (60 * activity.getDuration() > elapsedSeconds) {
+                remainingActivitySeconds = (60 * activity.getDuration()) - elapsedSeconds;
+                break;
+            } else {
+                elapsedSeconds -= (60 * activity.getDuration());
+            }
+        }
+
+        activityAdapter.setCurrentActivityPosition(position);
+
+        textTimer.setText(Session.formatTimer(remainingActivitySeconds));
+        textTotalTime.setText(Session.formatTimer(totalSeconds));
+        textRemainingTime.setText(Session.formatTimer(remainingSeconds));
+
+        // String title = "Session: " + session.getName() + " " + Session.formatTimer(totalSeconds);
+        // String description = "Activity: " + Session.formatTimer(remainingActivitySeconds);
+        // timerService.updateNotification(title, description);
+    }
 
 
     /**
@@ -241,6 +268,8 @@ public class RunSessionActivity extends AppCompatActivity {
 
         // Foreground notification id
         private static final int NOTIFICATION_ID = 1;
+
+        private Notification currentNotification;
 
         // Service binder
         private final IBinder serviceBinder = new RunServiceBinder();
@@ -330,11 +359,23 @@ public class RunSessionActivity extends AppCompatActivity {
                     (System.currentTimeMillis() - startTime) / 1000;
         }
 
+        public void updateNotification (String title, String description)
+        {
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+            notificationManager.notify(
+                    NOTIFICATION_ID,
+                    createNotification(title, description));
+        }
+
         /**
          * Place the service into the foreground
          */
         public void foreground() {
-            startForeground(NOTIFICATION_ID, createNotification());
+            startForeground(NOTIFICATION_ID, createNotification(
+                    "Timer Active", "Tap to return to the timer"
+            ));
         }
 
         /**
@@ -349,10 +390,10 @@ public class RunSessionActivity extends AppCompatActivity {
          *
          * @return a notification for interacting with the service when in the foreground
          */
-        private Notification createNotification() {
+        private Notification createNotification(String title, String description) {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                    .setContentTitle("Timer Active")
-                    .setContentText("Tap to return to the timer")
+                    .setContentTitle(title)
+                    .setContentText(description)
                     .setSmallIcon(R.mipmap.ic_launcher);
 
             Intent resultIntent = new Intent(this, RunSessionActivity.class);
