@@ -138,7 +138,7 @@ public class RunSessionActivity extends AppCompatActivity {
      */
     private void updateUIStartRun() {
         updateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
-        // timerButton.setText(R.string.timer_stop_button);
+        btnStartStop.setImageResource(android.R.drawable.ic_media_pause);
     }
 
     /**
@@ -146,7 +146,7 @@ public class RunSessionActivity extends AppCompatActivity {
      */
     private void updateUIStopRun() {
         updateTimeHandler.removeMessages(MSG_UPDATE_TIME);
-        // timerButton.setText(R.string.timer_start_button);
+        btnStartStop.setImageResource(android.R.drawable.ic_media_play);
     }
 
     /**
