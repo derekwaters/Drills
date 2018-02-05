@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -71,6 +72,7 @@ public class RunSessionActivity extends AppCompatActivity {
         listActivities = (RecyclerView)findViewById(R.id.sessionactivity_list);
 
         activityAdapter = new RunSessionListAdapter();
+        listActivities.setLayoutManager(new LinearLayoutManager(this));
         listActivities.setAdapter(activityAdapter);
 
         progressTimer.setMax(session.getDuration() * 60);
@@ -180,6 +182,7 @@ public class RunSessionActivity extends AppCompatActivity {
                 break;
             } else {
                 elapsedSeconds -= (60 * activity.getDuration());
+                position++;
             }
         }
 

@@ -20,7 +20,9 @@
         android:textAppearance="@style/AppTheme.RunSessionTimer"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
 
     <ImageButton
@@ -32,9 +34,8 @@
         android:layout_marginRight="24dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@+id/txtTimer"
-        android:layout_marginTop="0dp"
         app:layout_constraintBottom_toBottomOf="@+id/txtTimer"
-        android:layout_marginBottom="0dp" />
+        android:layout_marginEnd="24dp" />
 
     <TextView
         android:id="@+id/txtTotalTime"
@@ -42,19 +43,19 @@
         android:layout_height="wrap_content"
         android:text="99:99"
         app:layout_constraintTop_toTopOf="@+id/progressTimer"
-        android:layout_marginTop="0dp"
         android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="8dp" />
 
     <TextView
         android:id="@+id/txtRemainingTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
         android:text="99:99"
         app:layout_constraintTop_toTopOf="@+id/progressTimer"
         android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginEnd="8dp" />
 
     <ProgressBar
         android:id="@+id/progressTimer"
@@ -66,15 +67,17 @@
         android:layout_marginTop="24dp"
         app:layout_constraintLeft_toRightOf="@+id/txtTotalTime"
         app:layout_constraintRight_toLeftOf="@+id/txtRemainingTime"
-        app:layout_constraintTop_toBottomOf="@+id/txtTimer" />
+        app:layout_constraintTop_toBottomOf="@+id/txtTimer"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/sessionactivity_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:horizontalSpacing="10dp"
@@ -84,7 +87,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progressTimer"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintVertical_bias="0.0" />
 
 </android.support.constraint.ConstraintLayout>
