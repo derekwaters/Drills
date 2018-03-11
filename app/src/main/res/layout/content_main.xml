@@ -11,6 +11,9 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:dividerHeight="10dp"
+        android:divider="@android:color/transparent"
+        android:padding="10dp"
         android:id="@+id/session_list"
         >
     </ListView>
