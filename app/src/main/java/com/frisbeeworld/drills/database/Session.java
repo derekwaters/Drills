@@ -18,10 +18,20 @@ public class Session {
     private Date startTime;
     private HashMap<String, DrillActivity> activities;
 
+    // Runtime properties
+    private long currentSessionRemainingTime;
+    private long currentSessionStatus;
+
     public Session()
     {
         this.activities = new HashMap<>();
     }
+
+    @Exclude
+    public long getRemainingTime () { return currentSessionRemainingTime; }
+    @Exclude
+    public void setRemainingTime (long remaining) { currentSessionRemainingTime = remaining; }
+
 
     @Exclude
     public String getId() {

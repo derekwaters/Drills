@@ -48,7 +48,7 @@
             android:name=".RunSessionActivity"
             android:label="@string/title_activity_run_session"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <service android:name=".RunSessionActivity$TimerService" android:exported="false" />
     </application>
 
+    <uses-permission android:name="android.permission.VIBRATE"/>
 </manifest>

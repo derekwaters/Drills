@@ -1,32 +1,20 @@
 package com.frisbeeworld.drills;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Binder;
+import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.Message;
-import android.support.v4.app.NotificationCompat;
+import android.os.CountDownTimer;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.frisbeeworld.drills.database.DrillActivity;
 import com.frisbeeworld.drills.database.Session;
-
-import java.lang.ref.WeakReference;
 
 public class RunSessionActivity extends AppCompatActivity {
 
@@ -34,11 +22,11 @@ public class RunSessionActivity extends AppCompatActivity {
     public static final String  SESSION_ID = "SessionId";
     private final static int    MSG_UPDATE_TIME = 0;
 
+    // DEBUG ONLY!
+    private static final int    SECS_PER_MIN = 5;
+    // private final static int    SECS_PER_MIN = 60;
+
     private Session session;
-
-
-    private TimerService timerService;
-    private boolean serviceBound;
 
     private TextView textTimer;
     private TextView textTotalTime;
@@ -48,9 +36,13 @@ public class RunSessionActivity extends AppCompatActivity {
     private RecyclerView listActivities;
     private RunSessionListAdapter activityAdapter;
 
-    // Handler to update the UI every second when the timer is running
-    private final android.os.Handler updateTimeHandler = new UIUpdateHandler(this);
 
+    // Runtime countdown
+    private boolean         timerRunning;
+    private long            timerRemainingTime;
+    private CountDownTimer  timer;
+    private int             currentSessionActivity;
+    private long            totalExpiredTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,27 +67,34 @@ public class RunSessionActivity extends AppCompatActivity {
         listActivities.setLayoutManager(new LinearLayoutManager(this));
         listActivities.setAdapter(activityAdapter);
 
-        progressTimer.setMax(session.getDuration() * 60);
+        progressTimer.setMax(session.getDuration() * SECS_PER_MIN);
         progressTimer.setProgress(0);
-        updateSessionUI(0);
+
+        timerRunning = false;
+
+        currentSessionActivity = 0;
+        totalExpiredTime = 0;
+        timerRemainingTime = session.getActivity(currentSessionActivity).getDuration() * SECS_PER_MIN;
+
+        updateSessionUI();
 
         btnStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (serviceBound && !timerService.isTimerRunning()) {
-                    if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                        Log.v(TAG, "Starting timer");
-                    }
-                    timerService.startTimer();
-                    updateUIStartRun();
-                }
-                else if (serviceBound && timerService.isTimerRunning()) {
-                    if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                        Log.v(TAG, "Stopping timer");
-                    }
-                    timerService.stopTimer();
+                if (timerRunning)
+                {
                     updateUIStopRun();
+                    timer.cancel();
+                    timer = null;
+                    timerRunning = false;
+                }
+                else
+                {
+                    updateUIStartRun();
+                    startNewTimer();
+                    timerRunning = true;
+
                 }
             }
         });
@@ -107,29 +106,83 @@ public class RunSessionActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (Log.isLoggable(TAG, Log.VERBOSE)) {
-            Log.v(TAG, "Starting and binding service");
-        }
-        Intent i = new Intent(this, TimerService.class);
-        startService(i);
-        bindService(i, mConnection, 0);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         updateUIStopRun();
-        if (serviceBound) {
-            // If a timer is active, foreground the service, otherwise kill the service
-            if (timerService.isTimerRunning()) {
-                timerService.foreground();
+    }
+
+    private void startNewTimer ()
+    {
+        timer = new CountDownTimer(timerRemainingTime * 1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished)
+            {
+                timerRemainingTime = millisUntilFinished / 1000;
+                updateSessionUI();
             }
-            else {
-                stopService(new Intent(this, TimerService.class));
+
+            @Override
+            public void onFinish()
+            {
+                fireAlarm();
+                timerFinished();
             }
-            // Unbind the service
-            unbindService(mConnection);
-            serviceBound = false;
+        };
+        timer.start();
+    }
+
+    private void fireAlarm ()
+    {
+        Vibrator vibrate = (Vibrator)this.getSystemService(Context.VIBRATOR_SERVICE);
+
+        final Thread thisThread = Thread.currentThread();
+
+        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.in_call_alarm);
+        if (mediaPlayer != null) {
+            mediaPlayer.setLooping(false);
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    thisThread.interrupt();
+                }
+            });
+            long[] pattern = {50, 500};
+            vibrate.vibrate(pattern, 0);
+
+            mediaPlayer.start();
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+
+            }
+            mediaPlayer.stop();
+
+            vibrate.cancel();
+            mediaPlayer.release();
+        }
+    }
+
+    private void timerFinished ()
+    {
+        // Clear the UI? Do a session finished thingo?
+
+        totalExpiredTime += session.getActivity(currentSessionActivity).getDuration() * SECS_PER_MIN;
+
+        currentSessionActivity++;
+        if (currentSessionActivity == session.getActivities().size())
+        {
+            // We're all done!
+
+        }
+        else
+        {
+            updateSessionUI();
+            timerRemainingTime = session.getActivity(currentSessionActivity).getDuration() * SECS_PER_MIN;
+            timer = null;
+            startNewTimer();
         }
     }
 
@@ -137,7 +190,6 @@ public class RunSessionActivity extends AppCompatActivity {
      * Updates the UI when a run starts
      */
     private void updateUIStartRun() {
-        updateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
         btnStartStop.setImageResource(android.R.drawable.ic_media_pause);
     }
 
@@ -145,268 +197,24 @@ public class RunSessionActivity extends AppCompatActivity {
      * Updates the UI when a run stops
      */
     private void updateUIStopRun() {
-        updateTimeHandler.removeMessages(MSG_UPDATE_TIME);
         btnStartStop.setImageResource(android.R.drawable.ic_media_play);
     }
 
-    /**
-     * Updates the timer readout in the UI; the service must be bound
-     */
-    private void updateUITimer() {
-        if (serviceBound) {
-            // Update all the bits and pieces.
-            long elapsedSeconds = timerService.elapsedTime();
-
-            this.updateSessionUI(elapsedSeconds);
-
-        }
-    }
-
-    private void updateSessionUI (long elapsedSeconds)
+    private void updateSessionUI ()
     {
-        // DEBUG ONLY
-        elapsedSeconds = elapsedSeconds * 10;
-        // DEBUG ONLY
+        long totalSeconds = session.getDuration() * SECS_PER_MIN;
+        long remainingSeconds = totalSeconds - totalExpiredTime -
+                (session.getActivity(currentSessionActivity).getDuration() * SECS_PER_MIN)
+                + timerRemainingTime;
+        long elapsedSeconds = totalSeconds - remainingSeconds;
+
         progressTimer.setProgress((int)elapsedSeconds);
-        long totalSeconds = 60 * session.getDuration();
-        long remainingSeconds = totalSeconds - elapsedSeconds;
-        long remainingActivitySeconds;
-        String currentActivity;
-        // Now work out the remaining time in the current activity
-        int position = 0;
-        while (true)
-        {
-            DrillActivity activity = session.getActivity(position);
-            if (60 * activity.getDuration() > elapsedSeconds) {
-                remainingActivitySeconds = (60 * activity.getDuration()) - elapsedSeconds;
-                break;
-            } else {
-                elapsedSeconds -= (60 * activity.getDuration());
-                position++;
-            }
-        }
 
-        activityAdapter.setCurrentActivityPosition(position);
+        activityAdapter.setCurrentActivityPosition(currentSessionActivity);
 
-        textTimer.setText(Session.formatTimer(remainingActivitySeconds));
+        textTimer.setText(Session.formatTimer(timerRemainingTime));
         textTotalTime.setText(Session.formatTimer(totalSeconds));
         textRemainingTime.setText(Session.formatTimer(remainingSeconds));
-
-        // String title = "Session: " + session.getName() + " " + Session.formatTimer(totalSeconds);
-        // String description = "Activity: " + Session.formatTimer(remainingActivitySeconds);
-        // timerService.updateNotification(title, description);
-    }
-
-
-    /**
-     * Callback for service binding, passed to bindService()
-     */
-    private ServiceConnection mConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "Service bound");
-            }
-            TimerService.RunServiceBinder binder = (TimerService.RunServiceBinder) service;
-            timerService = binder.getService();
-            serviceBound = true;
-            // Ensure the service is not in the foreground when bound
-            timerService.background();
-            // Update the UI if the service is already running the timer
-            if (timerService.isTimerRunning()) {
-                updateUIStartRun();
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "Service disconnect");
-            }
-            serviceBound = false;
-        }
-    };
-
-
-
-    /**
-     * When the timer is running, use this handler to update
-     * the UI every second to show timer progress
-     */
-    static class UIUpdateHandler extends android.os.Handler {
-
-        private final static int UPDATE_RATE_MS = 1000;
-        private final WeakReference<RunSessionActivity> activity;
-
-        UIUpdateHandler(RunSessionActivity activity) {
-            this.activity = new WeakReference<>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message message) {
-            if (MSG_UPDATE_TIME == message.what) {
-                if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                    Log.v(TAG, "updating time");
-                }
-                activity.get().updateUITimer();
-                sendEmptyMessageDelayed(MSG_UPDATE_TIME, UPDATE_RATE_MS);
-            }
-        }
-    }
-
-
-    /**
-     * Timer service tracks the start and end time of timer; service can be placed into the
-     * foreground to prevent it being killed when the activity goes away
-     */
-    public static class TimerService extends Service {
-
-        private static final String TAG = TimerService.class.getSimpleName();
-
-        private long startTime, endTime;
-
-        // Is the service tracking time?
-        private boolean isTimerRunning;
-
-        // Foreground notification id
-        private static final int NOTIFICATION_ID = 1;
-
-        private Notification currentNotification;
-
-        // Service binder
-        private final IBinder serviceBinder = new RunServiceBinder();
-
-        public class RunServiceBinder extends Binder {
-            TimerService getService() {
-                return TimerService.this;
-            }
-        }
-
-        @Override
-        public void onCreate() {
-            if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "Creating service");
-            }
-            startTime = 0;
-            endTime = 0;
-            isTimerRunning = false;
-        }
-
-        @Override
-        public int onStartCommand(Intent intent, int flags, int startId) {
-            if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "Starting service");
-            }
-            return Service.START_STICKY;
-        }
-
-        @Override
-        public IBinder onBind(Intent intent) {
-            if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "Binding service");
-            }
-            return serviceBinder;
-        }
-
-        @Override
-        public void onDestroy() {
-            super.onDestroy();
-            if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "Destroying service");
-            }
-        }
-
-        /**
-         * Starts the timer
-         */
-        public void startTimer() {
-            if (!isTimerRunning) {
-                startTime = System.currentTimeMillis();
-                isTimerRunning = true;
-            }
-            else {
-                Log.e(TAG, "startTimer request for an already running timer");
-            }
-        }
-
-        /**
-         * Stops the timer
-         */
-        public void stopTimer() {
-            if (isTimerRunning) {
-                endTime = System.currentTimeMillis();
-                isTimerRunning = false;
-            }
-            else {
-                Log.e(TAG, "stopTimer request for a timer that isn't running");
-            }
-        }
-
-        /**
-         * @return whether the timer is running
-         */
-        public boolean isTimerRunning() {
-            return isTimerRunning;
-        }
-
-        /**
-         * Returns the  elapsed time
-         *
-         * @return the elapsed time in seconds
-         */
-        public long elapsedTime() {
-            // If the timer is running, the end time will be zero
-            return endTime > startTime ?
-                    (endTime - startTime) / 1000 :
-                    (System.currentTimeMillis() - startTime) / 1000;
-        }
-
-        public void updateNotification (String title, String description)
-        {
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-            notificationManager.notify(
-                    NOTIFICATION_ID,
-                    createNotification(title, description));
-        }
-
-        /**
-         * Place the service into the foreground
-         */
-        public void foreground() {
-            startForeground(NOTIFICATION_ID, createNotification(
-                    "Timer Active", "Tap to return to the timer"
-            ));
-        }
-
-        /**
-         * Return the service to the background
-         */
-        public void background() {
-            stopForeground(true);
-        }
-
-        /**
-         * Creates a notification for placing the service into the foreground
-         *
-         * @return a notification for interacting with the service when in the foreground
-         */
-        private Notification createNotification(String title, String description) {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                    .setContentTitle(title)
-                    .setContentText(description)
-                    .setSmallIcon(R.mipmap.ic_launcher);
-
-            Intent resultIntent = new Intent(this, RunSessionActivity.class);
-            PendingIntent resultPendingIntent =
-                    PendingIntent.getActivity(this, 0, resultIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT);
-            builder.setContentIntent(resultPendingIntent);
-
-            return builder.build();
-        }
     }
 };
 
