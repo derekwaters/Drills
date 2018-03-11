@@ -1,5 +1,9 @@
 package com.frisbeeworld.drills;
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Paint;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
@@ -103,10 +107,26 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         public TextView textSessionDateTime;
         public TextView textSessionDuration;
 
-        public void refreshHeaderInfo (Session currentSession)
+        public void refreshHeaderInfo (final Context context, final Session currentSession)
         {
             this.textSessionName.setText(currentSession.getName());
             this.textSessionLocation.setText(currentSession.getLocation());
+            this.textSessionLocation.setPaintFlags(
+                    this.textSessionLocation.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG
+            );
+            this.textSessionLocation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Uri.Builder builder = new Uri.Builder();
+                    Uri geoLoc = builder.scheme("geo").path("0,0").appendQueryParameter("q",
+                            currentSession.getLocation()).build();
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(geoLoc);
+                    if (intent.resolveActivity(context.getPackageManager()) != null) {
+                        context.startActivity(intent);
+                    }
+                }
+            });
             this.textSessionDateTime.setText(currentSession.getStartTimeString());
             this.textSessionDuration.setText(Session.formatDuration(currentSession.getDuration()));
         }
@@ -194,7 +214,7 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         if (position == 0)
         {
             HeaderViewHolder header = (HeaderViewHolder)holder;
-            header.refreshHeaderInfo(currentSession);
+            header.refreshHeaderInfo(parentRecyclerView.getContext(), currentSession);
         }
         else
         {

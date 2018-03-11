@@ -4,6 +4,7 @@ package com.frisbeeworld.drills.database;
 import com.frisbeeworld.drills.DrillsDatastore;
 import com.google.firebase.database.Exclude;
 
+import java.text.DateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -88,7 +89,7 @@ public class Session {
 
     public String getStartTimeString ()
     {
-        return this.startTime.toString();
+        return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM).format(this.startTime);
     }
 
     public static String formatDuration (int duration)

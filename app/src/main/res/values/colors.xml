@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#8181FF</color>
-    <color name="colorChipSelected">#8181FF</color>
+    <color name="colorPrimary">#F53F3F</color>
+    <color name="colorPrimaryDark">#CF3F3F</color>
+    <color name="colorAccent">#FF5151</color>
+    <color name="colorChipSelected">#FF5151</color>
     <color name="colorChipText">#EEEEEE</color>
-    <color name="colorChipDeselected">#CECEFF</color>
+    <color name="colorChipDeselected">#FFCECE</color>
+    <color name="colorFooter">#6FBF5F</color>
 </resources>
