@@ -89,7 +89,7 @@ public class Session {
 
     public String getStartTimeString ()
     {
-        return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM).format(this.startTime);
+        return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(this.startTime);
     }
 
     public static String formatDuration (int duration)
