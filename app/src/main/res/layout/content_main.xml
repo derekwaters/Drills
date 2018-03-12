@@ -8,14 +8,14 @@
     tools:context="com.frisbeeworld.drills.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/session_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:dividerHeight="10dp"
-        android:divider="@android:color/transparent"
-        android:padding="10dp"
-        android:id="@+id/session_list"
-        >
-    </ListView>
+        android:scrollbars = "vertical"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:gravity="center" />
 
 </android.support.constraint.ConstraintLayout>

@@ -157,8 +157,6 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public void onActivityClicked (View v)
     {
         int itemPosition = parentRecyclerView.getChildLayoutPosition(v);
-
-        // TODO: Implement something when hitting a card
     }
 
     public void onEditActivity (int position)

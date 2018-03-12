@@ -9,12 +9,12 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.firebase.ui.auth.AuthUI;
 import com.frisbeeworld.drills.database.Session;
@@ -43,7 +43,8 @@ public class MainActivity extends AppCompatActivity
     private FloatingActionButton floatingActionButton;
 
     private SessionAdapter sessionAdapter;
-    private ListView sessionList;
+    private RecyclerView sessionList;
+    private RecyclerView.LayoutManager sessionListLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,26 +96,13 @@ public class MainActivity extends AppCompatActivity
         });
 
         List<Session> sessionsList = new ArrayList<>();
-        sessionAdapter = new SessionAdapter(this, R.layout.item_session, sessionsList);
-        sessionList = (ListView)findViewById(R.id.session_list);
+        sessionAdapter = new SessionAdapter(this);
+        sessionList = (RecyclerView) findViewById(R.id.session_list);
+
+        sessionListLayoutManager = new LinearLayoutManager(this);
+        sessionList.setLayoutManager(sessionListLayoutManager);
+
         sessionList.setAdapter(sessionAdapter);
-
-        sessionList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                return false;
-            }
-        });
-
-        sessionList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Session sessionData = sessionAdapter.getItem(position);
-                DrillsDatastore.getDatastore().setCurrentSession(sessionData);
-                Intent editSessionIntent = new Intent(getApplicationContext(), EditSessionActivity.class);
-                startActivity(editSessionIntent);
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -201,7 +189,7 @@ public class MainActivity extends AppCompatActivity
             mAuth.removeAuthStateListener(mAuthListener);
         }
         detachDatabaseReadListener();
-        sessionAdapter.clear();
+        // sessionAdapter.clear();
     }
 
     private void onSignedInInitialise(String username) {
@@ -217,7 +205,7 @@ public class MainActivity extends AppCompatActivity
     private void onSignedOutCleanup()
     {
         mCurrentUser = ANONYMOUS;
-        sessionAdapter.clear();
+        // sessionAdapter.clear();
         detachDatabaseReadListener();
     }
 

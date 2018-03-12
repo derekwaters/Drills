@@ -96,6 +96,15 @@ public class DrillsDatastore {
         return null;
     }
 
+
+    public Session getSessionAtPosition (int position)
+    {
+        if (position >= 0 && position < sessions.size()) {
+            return sessions.get(position);
+        }
+        return null;
+    }
+
     public void updateSession (Session session) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference sessionReference = db.getReference().child("sessions").
@@ -178,7 +187,9 @@ public class DrillsDatastore {
                     if (dataSnapshot.hasChildren()) {
                         Session newSession = dataSnapshot.getValue(Session.class);
                         newSession.setId(dataSnapshot.getKey());
-                        sessionAdapter.add(newSession);
+                        sessions.add(newSession);
+
+                        sessionAdapter.notifyDataSetChanged();
                     }
                 }
                 @Override
