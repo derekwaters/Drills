@@ -33,6 +33,7 @@ public class RunSessionActivity extends AppCompatActivity {
     private TextView textRemainingTime;
     private ProgressBar progressTimer;
     private ImageButton btnStartStop;
+    private ImageButton btnReset;
     private RecyclerView listActivities;
     private RunSessionListAdapter activityAdapter;
 
@@ -61,6 +62,7 @@ public class RunSessionActivity extends AppCompatActivity {
         textRemainingTime = (TextView)findViewById(R.id.txtRemainingTime);
         progressTimer = (ProgressBar)findViewById(R.id.progressTimer);
         btnStartStop = (ImageButton)findViewById(R.id.btnStartStop);
+        btnReset = (ImageButton)findViewById(R.id.btnReset);
         listActivities = (RecyclerView)findViewById(R.id.sessionactivity_list);
 
         activityAdapter = new RunSessionListAdapter();
@@ -77,6 +79,27 @@ public class RunSessionActivity extends AppCompatActivity {
         timerRemainingTime = session.getActivity(currentSessionActivity).getDuration() * SECS_PER_MIN;
 
         updateSessionUI();
+
+        btnReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (timerRunning)
+                {
+                    timer.cancel();
+                    timer = null;
+                    timerRunning = false;
+                }
+
+                updateUIStopRun();
+                progressTimer.setProgress(0);
+
+                currentSessionActivity = 0;
+                totalExpiredTime = 0;
+                timerRemainingTime = session.getActivity(currentSessionActivity).getDuration() * SECS_PER_MIN;
+
+                updateSessionUI();
+            }
+        });
 
         btnStartStop.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -190,14 +213,14 @@ public class RunSessionActivity extends AppCompatActivity {
      * Updates the UI when a run starts
      */
     private void updateUIStartRun() {
-        btnStartStop.setImageResource(android.R.drawable.ic_media_pause);
+        btnStartStop.setImageResource(R.drawable.ic_pause_black_48dp);
     }
 
     /**
      * Updates the UI when a run stops
      */
     private void updateUIStopRun() {
-        btnStartStop.setImageResource(android.R.drawable.ic_media_play);
+        btnStartStop.setImageResource(R.drawable.ic_play_arrow_black_48dp);
     }
 
     private void updateSessionUI ()
