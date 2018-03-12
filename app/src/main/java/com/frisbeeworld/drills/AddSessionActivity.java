@@ -21,15 +21,19 @@ import java.util.Calendar;
 
 public class AddSessionActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener {
 
+    public static final String SESSION_ID = "sessionId";
+
+    private String  sessionId;
+
     private TextView textSessionName;
     private TextView textSessionDate;
     private TextView textSessionTime;
     private TextView textSessionLocation;
     private Button btnAddSession;
 
-    private FirebaseDatabase firebaseDatabase;
-    private DatabaseReference sessionsReference;
-    private Date    selectedDate;
+    private FirebaseDatabase    firebaseDatabase;
+    private DatabaseReference   sessionsReference;
+    private Date                selectedDate;
 
     private DatePickerDialog datePicker;
     private TimePickerDialog timePicker;
@@ -42,6 +46,7 @@ public class AddSessionActivity extends AppCompatActivity implements DatePickerD
         setSupportActionBar(toolbar);
 
         selectedDate = new Date();
+        sessionId = null;
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         sessionsReference = firebaseDatabase.getReference().child("sessions");
@@ -54,6 +59,20 @@ public class AddSessionActivity extends AppCompatActivity implements DatePickerD
         textSessionLocation = (TextView)findViewById(R.id.editLocation);
         btnAddSession = (Button)findViewById(R.id.btnAddSession);
 
+        btnAddSession.setText(R.string.string_add_session_btn);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            sessionId = extras.getString(SESSION_ID);
+            if (sessionId != null) {
+                Session currentSession = DrillsDatastore.getDatastore().getSession(sessionId);
+                textSessionName.setText(currentSession.getName());
+                selectedDate = currentSession.getStartTime();
+                textSessionLocation.setText(currentSession.getLocation());
+
+                btnAddSession.setText(R.string.string_update_session_btn);
+            }
+        }
 
         final Calendar c = Calendar.getInstance();
         c.setTime(selectedDate);
@@ -86,16 +105,29 @@ public class AddSessionActivity extends AppCompatActivity implements DatePickerD
         btnAddSession.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Session addSession = new Session();
 
+                if (sessionId != null)
+                {
+                    Session updateSession = DrillsDatastore.getDatastore().getSession(sessionId);
 
-                addSession.setStartTime(new Date());
-                addSession.setLocation(textSessionLocation.getText().toString());
-                addSession.setName(textSessionName.getText().toString());
+                    updateSession.setStartTime(selectedDate);
+                    updateSession.setLocation(textSessionLocation.getText().toString());
+                    updateSession.setName(textSessionName.getText().toString());
 
-                DatabaseReference newSession = sessionsReference.push();
-                addSession.setId(newSession.getKey());
-                newSession.setValue(addSession);
+                    DrillsDatastore.getDatastore().updateSession(updateSession);
+                }
+                else
+                {
+                    Session addSession = new Session();
+
+                    addSession.setStartTime(selectedDate);
+                    addSession.setLocation(textSessionLocation.getText().toString());
+                    addSession.setName(textSessionName.getText().toString());
+
+                    DatabaseReference newSession = sessionsReference.push();
+                    addSession.setId(newSession.getKey());
+                    newSession.setValue(addSession);
+                }
 
                 finish();
             }

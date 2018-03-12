@@ -88,7 +88,7 @@ public class DrillsDatastore {
     {
         for (Session checkSession: sessions)
         {
-            if (checkSession.getId() == sessionId)
+            if (checkSession.getId().equals(sessionId))
             {
                 return checkSession;
             }
@@ -111,6 +111,17 @@ public class DrillsDatastore {
                 child(session.getId());
         sessionReference.setValue(session);
     }
+
+    public void removeSession (int position) {
+
+        Session removeSession = sessions.get(position);
+        FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference sessRef = db.getReference().child("sessions").
+                child(removeSession.getId());
+        sessRef.removeValue();
+        sessions.remove(position);
+    }
+
 
     public DrillActivity addActivity (Session session) {
 
@@ -187,9 +198,22 @@ public class DrillsDatastore {
                     if (dataSnapshot.hasChildren()) {
                         Session newSession = dataSnapshot.getValue(Session.class);
                         newSession.setId(dataSnapshot.getKey());
-                        sessions.add(newSession);
 
-                        sessionAdapter.notifyDataSetChanged();
+                        boolean foundYet = false;
+                        for (int i = 0; i < sessions.size(); i++)
+                        {
+                            if (sessions.get(i).getId().equals(newSession.getId()))
+                            {
+                                sessions.set(i, newSession);
+                                foundYet = true;
+                                break;
+                            }
+                        }
+                        if (!foundYet)
+                        {
+                            sessions.add(newSession);
+                        }
+                        sessionAdapter.refreshSessionList();
                     }
                 }
                 @Override

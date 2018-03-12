@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity
 
     public static final String ANONYMOUS = "Anonymous";
     public static final int RC_SIGN_IN = 101;
+    public static final int REQUEST_EDIT_SESSION = 1;
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -45,6 +46,19 @@ public class MainActivity extends AppCompatActivity
     private SessionAdapter sessionAdapter;
     private RecyclerView sessionList;
     private RecyclerView.LayoutManager sessionListLayoutManager;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_EDIT_SESSION) {
+                // I don't think we need to do anything here, do we?
+                sessionAdapter.refreshSessionList();
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -212,5 +226,18 @@ public class MainActivity extends AppCompatActivity
     private void detachDatabaseReadListener()
     {
         DrillsDatastore.getDatastore().detachDatabaseListeners();
+    }
+
+    public void editSession (Session editSession)
+    {
+        Intent editSessionIntent = new Intent(getApplicationContext(), AddSessionActivity.class);
+        editSessionIntent.putExtra(AddSessionActivity.SESSION_ID, editSession.getId());
+        startActivityForResult(editSessionIntent, REQUEST_EDIT_SESSION);
+    }
+
+    public void removeSession (int position)
+    {
+        DrillsDatastore.getDatastore().removeSession(position);
+        sessionAdapter.refreshSessionList();
     }
 }

@@ -8,9 +8,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.frisbeeworld.drills.database.Session;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 
 /**
  * Created by Derek on 9/04/2017.
@@ -21,6 +27,10 @@ public class SessionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private RecyclerView parentRecyclerView;
     private SessionOnClickListener onClickListener;
     private MainActivity parentActivity;
+
+    private boolean     showOnlyFutureSessions;
+
+    private ArrayList<Integer> sessionList;
 
     public class SessionOnClickListener implements View.OnClickListener {
 
@@ -37,34 +47,9 @@ public class SessionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public TextView sessionDateTime;
         public TextView sessionDuration;
         public TextView sessionLocation;
+        public Button   btnEdit;
+        public Button   btnRemove;
         public int currentPosition;
-/*
-        final Session session = getItem(position);
-
-        teamName.setText("Caulfield Bears");
-        sessionName.setText(session.getName());
-        sessionDateTime.setText(session.getStartTimeString());
-        sessionDuration.setText(Integer.toString(session.getDuration()));
-        sessionLocation.setText(session.getLocation());
-        sessionLocation.setPaintFlags(
-                sessionLocation.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG
-        );
-        sessionLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Uri.Builder builder = new Uri.Builder();
-                Uri geoLoc = builder.scheme("geo").path("0,0").appendQueryParameter("q",
-                        session.getLocation()).build();
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(geoLoc);
-                if (intent.resolveActivity(getContext().getPackageManager()) != null) {
-                    getContext().startActivity(intent);
-                }
-            }
-        });
-*/
-
-
 
         public SessionViewHolder(View v) {
             super(v);
@@ -75,9 +60,8 @@ public class SessionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             sessionDuration = (TextView)v.findViewById(R.id.textSessionDuration);
             sessionLocation = (TextView)v.findViewById(R.id.textSessionLocation);
 
-            // TODO: Add these
-            // btnEdit = (Button)v.findViewById(R.id.session_edit_btn);
-            // btnRemove = (Button)v.findViewById(R.id.session_remove_btn);
+            btnEdit = (Button)v.findViewById(R.id.session_edit_btn);
+            btnRemove = (Button)v.findViewById(R.id.session_remove_btn);
         }
 
         public void refreshInfo (final Session session, int currentPosition, final Context context) {
@@ -106,26 +90,57 @@ public class SessionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             this.currentPosition = currentPosition;
 
-            /*
             btnEdit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    EditSessionListAdapter.this.onEditActivity(ActivityViewHolder.this.currentPosition);
+                    SessionAdapter.this.onEditSession(SessionViewHolder.this.currentPosition);
                 }
             });
             btnRemove.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    EditSessionListAdapter.this.onRemoveActivity(ActivityViewHolder.this.currentPosition);
+                    SessionAdapter.this.onRemoveSession(SessionViewHolder.this.currentPosition);
                 }
             });
-            */
         }
     }
 
     public SessionAdapter(MainActivity parent) {
         this.onClickListener = new SessionOnClickListener();
         this.parentActivity = parent;
+
+        this.showOnlyFutureSessions = false;
+
+        sessionList = new ArrayList<>();
+
+        this.refreshSessionList();
+    }
+
+    public void refreshSessionList ()
+    {
+        this.sessionList.clear();
+
+        final ArrayList<Session> sessions = DrillsDatastore.getDatastore().getSessions();
+        Date rightNow = new Date();
+        for (int i = 0; i < sessions.size(); i++)
+        {
+            Session session = sessions.get(i);
+            if (!this.showOnlyFutureSessions || session.getStartTime().after(rightNow))
+            {
+                this.sessionList.add(i);
+            }
+        }
+
+        Collections.sort(this.sessionList, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                Session firstSession = sessions.get(o1);
+                Session secondSession = sessions.get(o2);
+                return firstSession.getStartTime().compareTo(secondSession.getStartTime());
+            }
+        });
+
+        this.notifyDataSetChanged();
     }
 
     @Override
@@ -145,22 +160,18 @@ public class SessionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         parentRecyclerView.getContext().startActivity(editSessionIntent);
     }
 
-    /*
-    public void onEditActivity (int position)
+    public void onEditSession (int position)
     {
-        Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
-        DrillActivity activity = currentSession.getActivity(position);
-
-        parentActivity.editActivity(activity);
+        Session currentSession = DrillsDatastore.getDatastore().getSessionAtPosition(position);
+        parentActivity.editSession(currentSession);
     }
 
-    public void onRemoveActivity (int position)
+    public void onRemoveSession (int position)
     {
-        parentActivity.removeActivity(position);
+        parentActivity.removeSession(position);
         this.notifyItemRemoved(position);
         this.notifyDataSetChanged();
     }
-    */
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -180,13 +191,14 @@ public class SessionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
-        Session theSession = DrillsDatastore.getDatastore().getSessionAtPosition(position);
+        int index = sessionList.get(position);
+        Session theSession = DrillsDatastore.getDatastore().getSessionAtPosition(index);
         SessionViewHolder sessionView = (SessionViewHolder)holder;
         sessionView.refreshInfo(theSession, position, parentRecyclerView.getContext());
     }
 
     @Override
     public int getItemCount() {
-        return DrillsDatastore.getDatastore().getSessions().size();
+        return sessionList.size();
     }
 }
