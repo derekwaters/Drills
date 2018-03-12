@@ -109,10 +109,16 @@ public class SessionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.onClickListener = new SessionOnClickListener();
         this.parentActivity = parent;
 
-        this.showOnlyFutureSessions = false;
+        this.showOnlyFutureSessions = true;
 
         sessionList = new ArrayList<>();
 
+        this.refreshSessionList();
+    }
+
+    public void setShowOnlyFutureSessions (boolean showOnlyFutureSessions)
+    {
+        this.showOnlyFutureSessions = showOnlyFutureSessions;
         this.refreshSessionList();
     }
 

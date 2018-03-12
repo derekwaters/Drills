@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.main_sessions, menu);
         return true;
     }
 
@@ -160,6 +160,13 @@ public class MainActivity extends AppCompatActivity
         {
             AuthUI.getInstance().signOut(this);
             return true;
+        }
+        else if (id == R.id.menu_show_old_toggle)
+        {
+            boolean currentValue = item.isChecked();
+            currentValue = !currentValue;
+            sessionAdapter.setShowOnlyFutureSessions(!currentValue);
+            item.setChecked(currentValue);
         }
 
         return super.onOptionsItemSelected(item);
