@@ -23,8 +23,8 @@ public class RunSessionActivity extends AppCompatActivity {
     private final static int    MSG_UPDATE_TIME = 0;
 
     // DEBUG ONLY!
-    private static final int    SECS_PER_MIN = 5;
-    // private final static int    SECS_PER_MIN = 60;
+    // private static final int    SECS_PER_MIN = 5;
+    private final static int    SECS_PER_MIN = 60;
 
     private Session session;
 

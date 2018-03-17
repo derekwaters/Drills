@@ -242,9 +242,9 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(editSessionIntent, REQUEST_EDIT_SESSION);
     }
 
-    public void removeSession (int position)
+    public void removeSession (String sessionId)
     {
-        DrillsDatastore.getDatastore().removeSession(position);
+        DrillsDatastore.getDatastore().removeSession(sessionId);
         sessionAdapter.refreshSessionList();
     }
 }

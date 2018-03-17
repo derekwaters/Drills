@@ -50,6 +50,7 @@ public class SessionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public Button   btnEdit;
         public Button   btnRemove;
         public int currentPosition;
+        public String currentSessionId;
 
         public SessionViewHolder(View v) {
             super(v);
@@ -62,6 +63,11 @@ public class SessionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             btnEdit = (Button)v.findViewById(R.id.session_edit_btn);
             btnRemove = (Button)v.findViewById(R.id.session_remove_btn);
+        }
+
+        public String getCurrentSessionId ()
+        {
+            return this.currentSessionId;
         }
 
         public void refreshInfo (final Session session, int currentPosition, final Context context) {
@@ -88,18 +94,19 @@ public class SessionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 }
             });
 
+            this.currentSessionId = session.getId();
             this.currentPosition = currentPosition;
 
             btnEdit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SessionAdapter.this.onEditSession(SessionViewHolder.this.currentPosition);
+                    SessionAdapter.this.onEditSession(currentSessionId);
                 }
             });
             btnRemove.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SessionAdapter.this.onRemoveSession(SessionViewHolder.this.currentPosition);
+                    SessionAdapter.this.onRemoveSession(currentSessionId);
                 }
             });
         }
@@ -157,25 +164,24 @@ public class SessionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     public void onSessionClicked (View v)
     {
-        int itemPosition = parentRecyclerView.getChildLayoutPosition(v);
+        SessionViewHolder sessionViewHolder = (SessionViewHolder)parentRecyclerView.getChildViewHolder(v);
 
-        Session session = DrillsDatastore.getDatastore().getSessionAtPosition(itemPosition);
+        Session session = DrillsDatastore.getDatastore().getSession(sessionViewHolder.getCurrentSessionId());
         DrillsDatastore.getDatastore().setCurrentSession(session);
         Intent editSessionIntent = new Intent(parentRecyclerView.getContext(),
                 EditSessionActivity.class);
         parentRecyclerView.getContext().startActivity(editSessionIntent);
     }
 
-    public void onEditSession (int position)
+    public void onEditSession (String sessionId)
     {
-        Session currentSession = DrillsDatastore.getDatastore().getSessionAtPosition(position);
+        Session currentSession = DrillsDatastore.getDatastore().getSession(sessionId);
         parentActivity.editSession(currentSession);
     }
 
-    public void onRemoveSession (int position)
+    public void onRemoveSession (String sessionId)
     {
-        parentActivity.removeSession(position);
-        this.notifyItemRemoved(position);
+        parentActivity.removeSession(sessionId);
         this.notifyDataSetChanged();
     }
 

@@ -112,14 +112,14 @@ public class DrillsDatastore {
         sessionReference.setValue(session);
     }
 
-    public void removeSession (int position) {
+    public void removeSession (String sessionId) {
 
-        Session removeSession = sessions.get(position);
+        Session removeSession = getSession(sessionId);
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference sessRef = db.getReference().child("sessions").
                 child(removeSession.getId());
         sessRef.removeValue();
-        sessions.remove(position);
+        sessions.remove(removeSession);
     }
 
 
@@ -162,11 +162,11 @@ public class DrillsDatastore {
                     drills.add(newDrill);
                     drillMap.put(newDrill.getId(), newDrill);
 
-                    for (String tagName : newDrill.getTags())
-                    {
-                        if (!tags.contains(tagName))
-                        {
-                            tags.add(tagName);
+                    if (newDrill.getTags() != null) {
+                        for (String tagName : newDrill.getTags()) {
+                            if (!tags.contains(tagName)) {
+                                tags.add(tagName);
+                            }
                         }
                     }
                 }
