@@ -143,13 +143,12 @@ public class DrillsDatastore {
         return activity;
     }
 
-    public DrillActivity removeActivity (Session session, DrillActivity activity) {
+    public void removeActivity (Session session, String activityId) {
 
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference activRef = db.getReference().child("sessions").
-                child(session.getId()).child("activities").child(activity.getId());
+                child(session.getId()).child("activities").child(activityId);
         activRef.removeValue();
-        return activity;
     }
 
     public void setupDatabaseListeners(final SessionAdapter sessionAdapter) {

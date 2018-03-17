@@ -76,7 +76,7 @@ public class RunSessionActivity extends AppCompatActivity {
 
         currentSessionActivity = 0;
         totalExpiredTime = 0;
-        timerRemainingTime = session.getActivity(currentSessionActivity).getDuration() * SECS_PER_MIN;
+        timerRemainingTime = session.getActivityByPosition(currentSessionActivity).getDuration() * SECS_PER_MIN;
 
         updateSessionUI();
 
@@ -95,7 +95,7 @@ public class RunSessionActivity extends AppCompatActivity {
 
                 currentSessionActivity = 0;
                 totalExpiredTime = 0;
-                timerRemainingTime = session.getActivity(currentSessionActivity).getDuration() * SECS_PER_MIN;
+                timerRemainingTime = session.getActivityByPosition(currentSessionActivity).getDuration() * SECS_PER_MIN;
 
                 updateSessionUI();
             }
@@ -192,7 +192,7 @@ public class RunSessionActivity extends AppCompatActivity {
     {
         // Clear the UI? Do a session finished thingo?
 
-        totalExpiredTime += session.getActivity(currentSessionActivity).getDuration() * SECS_PER_MIN;
+        totalExpiredTime += session.getActivityByPosition(currentSessionActivity).getDuration() * SECS_PER_MIN;
 
         currentSessionActivity++;
         if (currentSessionActivity == session.getActivities().size())
@@ -203,7 +203,7 @@ public class RunSessionActivity extends AppCompatActivity {
         else
         {
             updateSessionUI();
-            timerRemainingTime = session.getActivity(currentSessionActivity).getDuration() * SECS_PER_MIN;
+            timerRemainingTime = session.getActivityByPosition(currentSessionActivity).getDuration() * SECS_PER_MIN;
             timer = null;
             startNewTimer();
         }
@@ -227,7 +227,7 @@ public class RunSessionActivity extends AppCompatActivity {
     {
         long totalSeconds = session.getDuration() * SECS_PER_MIN;
         long remainingSeconds = totalSeconds - totalExpiredTime -
-                (session.getActivity(currentSessionActivity).getDuration() * SECS_PER_MIN)
+                (session.getActivityByPosition(currentSessionActivity).getDuration() * SECS_PER_MIN)
                 + timerRemainingTime;
         long elapsedSeconds = totalSeconds - remainingSeconds;
 

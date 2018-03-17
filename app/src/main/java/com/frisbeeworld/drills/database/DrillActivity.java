@@ -6,6 +6,7 @@ public class DrillActivity {
     private String id;
     private String drillId;
     private int groupId;
+    private int order;
     private int duration;
     private String notes;
 
@@ -49,6 +50,10 @@ public class DrillActivity {
     public void setNotes(String notes) {
         this.notes = notes;
     }
+
+    public int getOrder() { return order; }
+
+    public void setOrder (int order) { this.order = order; }
 
     /*
      id

@@ -152,10 +152,10 @@ public class EditSessionActivity extends AppCompatActivity {
         startActivityForResult(editActivityIntent, RC_EDIT_ACTIVITY);
     }
 
-    public void removeActivity (int position)
+    public void removeActivity (String activityId)
     {
         Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
-        currentSession.removeActivity(position);
+        currentSession.removeActivity(activityId);
     }
 
     public void runSession ()

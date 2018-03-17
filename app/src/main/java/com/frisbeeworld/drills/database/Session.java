@@ -5,7 +5,9 @@ import com.frisbeeworld.drills.DrillsDatastore;
 import com.google.firebase.database.Exclude;
 
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
@@ -117,29 +119,51 @@ public class Session {
         newActivity.setDuration(duration);
         newActivity.setNotes(notes);
         newActivity.setDrillId(drillId);
+        // Find the maximum order
+        int newOrder = 0;
+
+        Collection<DrillActivity> activities = this.activities.values();
+        for (DrillActivity activity: activities)
+        {
+            if (activity.getOrder() >= newOrder)
+            {
+                newOrder = activity.getOrder() + 1;
+            }
+        }
+        newActivity.setOrder(newOrder);
         this.activities.put(drillId, newActivity);
 
         return newActivity;
     }
 
-    public void removeActivity (int position)
+    public void removeActivity (String id)
     {
-        Set<String> keys = this.activities.keySet();
-        String removeKey = (String)keys.toArray()[position];
-
-        DrillActivity theActivity = this.activities.get(removeKey);
-
-        this.activities.remove(removeKey);
+        this.activities.remove(id);
 
         DrillsDatastore.getDatastore().removeActivity(
                 DrillsDatastore.getDatastore().getCurrentSession(),
-                theActivity);
+                id);
     }
 
-    public DrillActivity getActivity (int position)
+    public DrillActivity getActivity (String id)
+    {
+        return this.activities.get(id);
+    }
+
+    public DrillActivity getActivityByPosition (int position)
     {
         Set<String> keys = this.activities.keySet();
-        String findKey = (String)keys.toArray()[position];
+        Object[] keyStrs = keys.toArray();
+        Arrays.sort(keyStrs, new Comparator<Object>() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                DrillActivity firstActivity = activities.get((String)o1);
+                DrillActivity secondActivity = activities.get((String)o2);
+                return firstActivity.getOrder() - secondActivity.getOrder();
+            }
+        });
+
+        String findKey = (String)keyStrs[position];
 
         DrillActivity result = this.activities.get(findKey);
         result.setId(findKey);

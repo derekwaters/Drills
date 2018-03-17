@@ -120,7 +120,7 @@ public class RunSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
         ActivityViewHolder activityHolder = (ActivityViewHolder)holder;
 
-        DrillActivity activity = currentSession.getActivity(activeActivityOffset + position);
+        DrillActivity activity = currentSession.getActivityByPosition(activeActivityOffset + position);
         activityHolder.refreshActivityInfo(position == 0, activity);
     }
 
