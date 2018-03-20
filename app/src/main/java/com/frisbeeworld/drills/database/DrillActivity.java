@@ -41,7 +41,7 @@ public class DrillActivity {
     public void setHasDuration(boolean hasDuration) { this.hasDuration = hasDuration; }
 
     public int getDuration() {
-        return duration;
+        return (this.hasDuration ? duration : 0);
     }
 
     public void setDuration(int duration) {
