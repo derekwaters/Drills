@@ -105,6 +105,12 @@ public class DrillsDatastore {
         return null;
     }
 
+    public void addSession (Session addSession) {
+        DatabaseReference newSession = sessionsReference.push();
+        addSession.setId(newSession.getKey());
+        newSession.setValue(addSession);
+    }
+
     public void updateSession (Session session) {
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference sessionReference = db.getReference().child("sessions").
@@ -120,6 +126,14 @@ public class DrillsDatastore {
                 child(removeSession.getId());
         sessRef.removeValue();
         sessions.remove(removeSession);
+    }
+
+    public Session copySession (String sessionId) {
+
+        Session copySession = getSession(sessionId);
+        copySession.setId(null);
+        addSession(copySession);
+        return copySession;
     }
 
 
