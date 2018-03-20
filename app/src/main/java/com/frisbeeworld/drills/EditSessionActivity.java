@@ -105,13 +105,15 @@ public class EditSessionActivity extends AppCompatActivity {
             Bundle res = data.getExtras();
             if (res != null) {
                 String newDrillId = res.getString(EditActivityActivity.ACTIVITY_DRILL_ID);
+                boolean hasDuration = res.getBoolean(EditActivityActivity.ACTIVITY_HAS_DURATION);
                 int newDuration = res.getInt(EditActivityActivity.ACTIVITY_DURATION);
                 String newNotes = res.getString(EditActivityActivity.ACTIVITY_NOTES);
                 Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
 
                 switch (requestCode) {
                     case RC_NEW_ACTIVITY:
-                        DrillActivity newActivity = currentSession.addActivity(newDrillId, newDuration, newNotes);
+                        DrillActivity newActivity = currentSession.addActivity(newDrillId,
+                                hasDuration, newDuration, newNotes);
 
                         DrillsDatastore.getDatastore().updateActivity(currentSession, newActivity);
 
@@ -126,6 +128,7 @@ public class EditSessionActivity extends AppCompatActivity {
                         updateActivity.setDrillId(newDrillId);
                         updateActivity.setDuration(newDuration);
                         updateActivity.setNotes(newNotes);
+                        updateActivity.setHasDuration(hasDuration);
 
                         DrillsDatastore.getDatastore().updateActivity(currentSession, updateActivity);
 

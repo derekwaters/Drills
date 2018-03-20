@@ -82,7 +82,10 @@ public class Session {
         Collection<DrillActivity> activities = this.activities.values();
         for (DrillActivity activity: activities)
         {
-            duration += activity.getDuration();
+            if (activity.getHasDuration())
+            {
+                duration += activity.getDuration();
+            }
         }
         return duration;
     }
@@ -111,7 +114,7 @@ public class Session {
         return String.format("%d:%02d", seconds / 60, seconds % 60);
     }
 
-    public DrillActivity addActivity(String drillId, int duration, String notes)
+    public DrillActivity addActivity(String drillId, boolean hasDuration, int duration, String notes)
     {
         DrillActivity newActivity = DrillsDatastore.getDatastore().addActivity(
                 DrillsDatastore.getDatastore().getCurrentSession());

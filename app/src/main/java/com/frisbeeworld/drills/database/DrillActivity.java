@@ -7,6 +7,7 @@ public class DrillActivity {
     private String drillId;
     private int groupId;
     private int order;
+    private boolean hasDuration;
     private int duration;
     private String notes;
 
@@ -35,6 +36,10 @@ public class DrillActivity {
         this.groupId = groupId;
     }
 
+    public boolean getHasDuration() { return hasDuration; }
+
+    public void setHasDuration(boolean hasDuration) { this.hasDuration = hasDuration; }
+
     public int getDuration() {
         return duration;
     }
@@ -55,12 +60,9 @@ public class DrillActivity {
 
     public void setOrder (int order) { this.order = order; }
 
-    /*
-     id
-- drillId
-- groupId
-- duration
-- location?
-- notes?
-     */
+    public void DrillActivity ()
+    {
+        this.hasDuration = true;
+        this.duration = 5;
+    }
 }

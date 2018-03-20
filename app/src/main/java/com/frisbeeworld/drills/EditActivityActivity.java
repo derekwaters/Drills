@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -21,6 +23,7 @@ public class EditActivityActivity extends AppCompatActivity {
     public static final String ACTIVITY_ID = "ACTIVITY_ID";
     public static final String ACTIVITY_DRILL_ID = "SELECTED_DRILL_ID";
     public static final String ACTIVITY_DURATION = "DRILL_DURATION";
+    public static final String ACTIVITY_HAS_DURATION = "DRILL_HAS_DURATION";
     public static final String ACTIVITY_NOTES = "DRILL_NOTES";
 
 
@@ -33,6 +36,7 @@ public class EditActivityActivity extends AppCompatActivity {
     SeekBar seekDuration;
     TextView textDurationOutput;
     TextView textDurationRecommended;
+    CheckBox checkNoDuration;
     EditText editNotes;
 
     private Drill selectedDrill = null;
@@ -54,6 +58,7 @@ public class EditActivityActivity extends AppCompatActivity {
         seekDuration = (SeekBar)findViewById(R.id.seekBarDuration);
         textDurationOutput = (TextView)findViewById(R.id.textDurationOutput);
         textDurationRecommended = (TextView)findViewById(R.id.textDurationRecommended);
+        checkNoDuration = (CheckBox)findViewById(R.id.checkNoDuration);
         editNotes = (EditText)findViewById(R.id.editNotes);
 
         btnPickDrill.setOnClickListener(new View.OnClickListener() {
@@ -61,6 +66,13 @@ public class EditActivityActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent pickDrillsIntent = new Intent(getApplicationContext(), PickDrillsActivity.class);
                 startActivityForResult(pickDrillsIntent, RC_PICK_DRILLS);
+            }
+        });
+
+        checkNoDuration.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                refreshDurationSettings();
             }
         });
 
@@ -106,12 +118,23 @@ public class EditActivityActivity extends AppCompatActivity {
                 Session currentSession = DrillsDatastore.getDatastore().getCurrentSession();
                 this.editActivity = currentSession.findActivity(activityId);
                 this.setSelectedDrill(DrillsDatastore.getDatastore().getDrill(this.editActivity.getDrillId()));
+                this.checkNoDuration.setChecked(!this.editActivity.getHasDuration());
                 this.seekDuration.setProgress(this.editActivity.getDuration());
+                this.refreshDurationSettings();
                 this.setDurationLabel();
                 this.editNotes.setText(this.editActivity.getNotes());
             }
         }
         getSupportActionBar().setTitle(activityTitle);
+    }
+
+    protected void refreshDurationSettings ()
+    {
+        boolean isChecked = checkNoDuration.isChecked();
+
+        seekDuration.setEnabled(!isChecked);
+        textDurationOutput.setVisibility(isChecked ? View.INVISIBLE : View.VISIBLE);
+        textDurationRecommended.setVisibility(isChecked ? View.INVISIBLE : View.VISIBLE);
     }
 
     protected void finishEditActivity ()
@@ -125,6 +148,7 @@ public class EditActivityActivity extends AppCompatActivity {
         {
             conData.putString(ACTIVITY_DRILL_ID, selectedDrill.getId());
         }
+        conData.putBoolean(ACTIVITY_HAS_DURATION, !checkNoDuration.isChecked());
         conData.putInt(ACTIVITY_DURATION, seekDuration.getProgress());
         conData.putString(ACTIVITY_NOTES, editNotes.getText().toString());
         Intent intent = new Intent();

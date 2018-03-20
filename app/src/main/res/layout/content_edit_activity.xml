@@ -111,14 +111,23 @@
         android:id="@+id/editNotes"
         android:layout_width="0dp"
         android:layout_height="243dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:gravity="top|left"
         android:inputType="textMultiLine"
         android:text="Test Test"
         app:layout_constraintLeft_toLeftOf="@+id/seekBarDuration"
-        app:layout_constraintTop_toBottomOf="@+id/textDurationLabel"
-        android:layout_marginRight="16dp"
-        app:layout_constraintRight_toRightOf="parent" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/checkNoDuration" />
+
+    <CheckBox
+        android:id="@+id/checkNoDuration"
+        style="@android:style/Widget.Material.Light.CompoundButton.CheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/check_no_duration"
+        app:layout_constraintStart_toStartOf="@+id/seekBarDuration"
+        app:layout_constraintTop_toBottomOf="@+id/textDurationLabel" />
 </android.support.constraint.ConstraintLayout>

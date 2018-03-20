@@ -9,6 +9,7 @@
     <string name="action_start">Start Session</string>
     <string name="string_session_showold">Show Old Sessions</string>
     <string name="title_activity_add_session">Add Session</string>
+    <string name="check_no_duration">No Duration</string>
     <string name="string_session_name">Session Name</string>
     <string name="string_session_date">Date</string>
     <string name="string_session_time">Time</string>

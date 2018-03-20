@@ -87,6 +87,7 @@ public class EditSessionListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             textNotes.setText(activity.getNotes());
 
             textTiming.setText(Session.formatDuration(activity.getDuration()));
+            textTiming.setVisibility(activity.getHasDuration() ? View.VISIBLE : View.INVISIBLE);
             btnEdit.setOnClickListener(new View.OnClickListener() {
                    @Override
                    public void onClick(View v) {
